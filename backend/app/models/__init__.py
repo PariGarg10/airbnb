@@ -7,6 +7,14 @@ class has been imported before the mapper is first used.
 from app.models.amenity import Amenity, listing_amenities
 from app.models.booking import Booking, BookingCompanion
 from app.models.coupon import Coupon
+from app.models.experience import (
+    Experience,
+    ExperienceBooking,
+    ExperienceImage,
+    ExperienceItineraryItem,
+    ExperienceReview,
+    ExperienceSlot,
+)
 from app.models.host_profile import HostProfile
 from app.models.listing import Listing, ListingImage, ListingOccupant
 from app.models.review import Review
@@ -18,6 +26,12 @@ __all__ = [
     "Booking",
     "BookingCompanion",
     "Coupon",
+    "Experience",
+    "ExperienceBooking",
+    "ExperienceImage",
+    "ExperienceItineraryItem",
+    "ExperienceReview",
+    "ExperienceSlot",
     "HostProfile",
     "Listing",
     "ListingImage",
@@ -28,4 +42,3 @@ __all__ = [
     "WishlistItem",
     "listing_amenities",
 ]
-

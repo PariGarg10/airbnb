@@ -14,7 +14,7 @@ from app.core.config import ensure_directories, settings
 from app.core.exceptions import BadRequestError, ConflictError, ForbiddenError, NotFoundError
 from app.db import SessionLocal, init_db
 from app.models import User
-from app.routers import bookings, coupons, host, listings, uploads, users, wishlist
+from app.routers import bookings, coupons, experience_bookings, experiences, host, listings, uploads, users, wishlist
 from app.seed import run_seed
 
 ensure_directories()
@@ -55,6 +55,8 @@ for _error, _status in (
 app.include_router(users.router)
 app.include_router(listings.router)
 app.include_router(bookings.router)
+app.include_router(experiences.router)
+app.include_router(experience_bookings.router)
 app.include_router(coupons.router)
 app.include_router(host.router)
 app.include_router(wishlist.router)

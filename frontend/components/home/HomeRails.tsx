@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowButton, SeeAllTile, searchHref, useRowScroller } from "@/components/home/homeRowUi";
 import { ListingCard } from "@/components/listings/ListingCard";
 import { DESTINATIONS } from "@/lib/destinations";
-import { listingPhotoUrl } from "@/lib/listingPhotoUrl";
+import { LISTING_THUMB_WIDTH, listingPhotoUrl } from "@/lib/listingPhotoUrl";
 import { isGuestFavourite } from "@/lib/isGuestFavourite";
 import type { ListingCard as ListingCardData } from "@/types";
 
@@ -45,7 +45,7 @@ function CoverPhoto({ src, alt }: { src?: string; alt: string }) {
   }
   return (
     <Image
-      src={listingPhotoUrl(current, 400)}
+      src={listingPhotoUrl(current, LISTING_THUMB_WIDTH)}
       alt=""
       fill
       className="object-cover"

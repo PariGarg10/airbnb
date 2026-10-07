@@ -1,6 +1,6 @@
 import { ProductCatalogPage } from "@/components/catalog/ProductCatalogPage";
-import { SERVICE_SECTIONS } from "@/lib/mock/services";
+import { SERVICE_SECTIONS } from "@/lib/catalogSections";
 
 export default function ServicesPage() {
-  return <ProductCatalogPage sections={SERVICE_SECTIONS} />;
+  return <ProductCatalogPage category="Services" sections={SERVICE_SECTIONS} />;
 }

@@ -330,7 +330,7 @@ export function ListingView({ initialListing }: { initialListing: ListingDetail 
           <Divider className="my-8 min-[1128px]:my-10" />
           <WhereYoullSleep bedrooms={listing.bedrooms} beds={listing.beds} images={listing.images} />
           <Divider className="my-8 hidden min-[1128px]:block min-[1128px]:my-10" />
-          <section id="amenities">
+          <section id="amenities" className="scroll-mt-[var(--listing-nav-h)]">
             <h2 className="t-heading min-[1128px]:text-[22px] min-[1128px]:leading-[26px]">What this place offers</h2>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 min-[1128px]:hidden">
               {previewAmenities.map((amenity) => {
@@ -394,8 +394,8 @@ export function ListingView({ initialListing }: { initialListing: ListingDetail 
                 "Add your travel dates for exact pricing"
               )}
             </p>
-            <div className="mt-6 min-[1128px]:mt-8 min-[1128px]:max-w-[720px]">
-              <div className="hidden min-[1128px]:block">
+            <div className="mt-6 min-[1128px]:mt-8">
+              <div className="listing-dates hidden min-[1128px]:block">
                 <DateRangePicker
                   checkIn={checkIn}
                   checkOut={checkOut}
@@ -451,7 +451,7 @@ export function ListingView({ initialListing }: { initialListing: ListingDetail 
         </div>
 
         <div className="order-1 max-[1127px]:order-1 min-[1128px]:order-2 min-[1128px]:overflow-visible">
-          <div ref={reserveAnchorRef} className="min-[1128px]:sticky min-[1128px]:top-[calc(var(--header-h)+var(--listing-nav-h)+16px)] min-[1128px]:overflow-visible min-[1128px]:z-20">
+          <div ref={reserveAnchorRef} className="min-[1128px]:sticky min-[1128px]:top-[calc(var(--listing-nav-h)+16px)] min-[1128px]:overflow-visible min-[1128px]:z-20">
             <ReserveCard listing={listing} disabledRanges={blocked} onDatesChange={applyDates} />
           </div>
         </div>

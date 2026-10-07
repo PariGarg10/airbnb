@@ -43,10 +43,11 @@ export function ExplorePage() {
     !filters.allows_pets;
 
   const listings = useInfiniteQuery({
-    queryKey: ["listings", filters, browsing ? 50 : 24],
-    queryFn: ({ pageParam }) => listingsApi.search({ ...filters, page: pageParam, page_size: browsing ? 50 : 24 }),
+    queryKey: ["listings", filters, browsing ? 40 : 24],
+    queryFn: ({ pageParam }) => listingsApi.search({ ...filters, page: pageParam, page_size: browsing ? 40 : 24 }),
     initialPageParam: 1,
     getNextPageParam: (last) => (last.has_more ? last.page + 1 : undefined),
+    staleTime: 60_000,
   });
 
   const items = listings.data?.pages.flatMap((page) => page.items) ?? [];

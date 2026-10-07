@@ -27,6 +27,7 @@ from app.services.coupon_service import require_coupon
 from app.services.listing_location import public_coordinates
 from app.services.listing_pricing import quote_listing_stay
 MAX_NIGHTS = 30
+CATALOG_CATEGORIES = frozenset({"Experiences", "Services"})
 
 
 class ListingSearch:
@@ -338,6 +339,8 @@ def _apply_filters(stmt, filters: ListingSearch):
         stmt = stmt.where(Listing.room_type == filters.room_type)
     if filters.category:
         stmt = stmt.where(Listing.category == filters.category)
+    else:
+        stmt = stmt.where(Listing.category.not_in(CATALOG_CATEGORIES))
     if filters.min_bedrooms is not None:
         stmt = stmt.where(Listing.bedrooms >= filters.min_bedrooms)
     if filters.min_beds is not None:

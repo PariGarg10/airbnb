@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { listingPhotoUrl } from "@/lib/listingPhotoUrl";
+import { LISTING_THUMB_WIDTH, listingPhotoUrl } from "@/lib/listingPhotoUrl";
 import type { ListingSearchParams } from "@/types";
 
 export function searchHref(params: ListingSearchParams) {
@@ -99,7 +99,7 @@ export function SeeAllTile({ href, photos }: { href: string; photos: string[] })
       <span className="see-all-fan" aria-hidden>
         {stack.map((photo, index) => (
           <span key={`${photo}-${index}`} className="see-all-card">
-            <Image src={listingPhotoUrl(photo, 400)} alt="" fill className="object-cover" sizes="120px" loading="lazy" />
+            <Image src={listingPhotoUrl(photo, LISTING_THUMB_WIDTH)} alt="" fill className="object-cover" sizes="120px" loading="lazy" />
           </span>
         ))}
       </span>

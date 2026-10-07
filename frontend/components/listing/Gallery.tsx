@@ -28,7 +28,7 @@ export function Gallery({ images, title, onShare, onSave, wishlisted }: GalleryP
   const [listOpen, setListOpen] = useState(false);
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [mobileIndex, setMobileIndex] = useState(0);
-  const photos = useMemo(() => images.map((image) => listingPhotoUrl(image.url, 1200)), [images]);
+  const photos = useMemo(() => images.map((image) => listingPhotoUrl(image.url, 720)), [images]);
 
   const openLightbox = (index: number) => setLightbox(index);
   const closeLightbox = () => setLightbox(null);
@@ -40,7 +40,7 @@ export function Gallery({ images, title, onShare, onSave, wishlisted }: GalleryP
   };
 
   return (
-    <div id="photos">
+    <div id="photos" className="scroll-mt-[var(--listing-nav-h)]">
       <div className="relative max-[1127px]:block min-[1128px]:hidden">
         <div
           className="flex snap-x snap-mandatory overflow-x-auto"

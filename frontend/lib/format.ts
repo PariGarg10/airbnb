@@ -32,6 +32,10 @@ export function formatInr(amount: number): string {
   return `₹${new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(amount)}`;
 }
 
+export function formatInrDecimal(amount: number): string {
+  return `₹${new Intl.NumberFormat("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)}`;
+}
+
 export function formatCompactInr(amount: number): string {
   if (amount < 1000) return formatInr(amount);
   const scaled = Math.round((amount / 1000) * 10) / 10;

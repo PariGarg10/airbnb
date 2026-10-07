@@ -2,8 +2,8 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { CatalogCard } from "@/components/catalog/CatalogCard";
-import type { CatalogItem } from "@/lib/mock/experiences";
+import { ListingCard } from "@/components/listings/ListingCard";
+import type { ListingCard as ListingCardData } from "@/types";
 
 function useRowScroller(itemCount: number) {
   const ref = useRef<HTMLDivElement>(null);
@@ -65,25 +65,17 @@ function ArrowButton({
 export function CatalogRow({
   title,
   subtitle,
-  featured,
-  items,
+  listings,
+  onNeedAuth,
 }: {
   title: string;
   subtitle?: string;
-  featured?: boolean;
-  items: CatalogItem[];
+  listings: ListingCardData[];
+  onNeedAuth: () => void;
 }) {
-  const { ref, edges, scrollPage } = useRowScroller(items.length);
+  const { ref, edges, scrollPage } = useRowScroller(listings.length);
 
-  if (featured) {
-    return (
-      <section>
-        <h2 className="t-section-title pl-0.5">{title}</h2>
-      </section>
-    );
-  }
-
-  if (items.length === 0) return null;
+  if (listings.length === 0) return null;
 
   return (
     <section>
@@ -98,9 +90,15 @@ export function CatalogRow({
         </div>
       </div>
       <div ref={ref} className="home-row no-scrollbar">
-        {items.map((item) => (
-          <div key={item.id} className="home-row-card">
-            <CatalogCard item={item} />
+        {listings.map((listing, index) => (
+          <div key={listing.id} className="home-row-card">
+            <ListingCard
+              listing={listing}
+              href={`/listings/${listing.id}`}
+              variant="rail"
+              priority={index < 2}
+              onNeedAuth={onNeedAuth}
+            />
           </div>
         ))}
       </div>

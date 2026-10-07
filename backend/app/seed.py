@@ -35,6 +35,12 @@ from app.models import (
     Booking,
     BookingCompanion,
     Coupon,
+    Experience,
+    ExperienceBooking,
+    ExperienceImage,
+    ExperienceItineraryItem,
+    ExperienceReview,
+    ExperienceSlot,
     HostProfile,
     Listing,
     ListingImage,
@@ -42,6 +48,7 @@ from app.models import (
     Review,
     User,
 )
+from app.seed_experiences import seed_experiences
 from app.models.enums import BookingMode, CancelReason, CancelledBy, OccupantType, PaymentMethodType
 from app.services.listing_pricing import quote_listing_stay
 from app.services.pricing_service import booking_price_fields
@@ -58,6 +65,103 @@ CANCELLED_UPCOMING = 1
 REVIEW_SHARE = Decimal("0.85")
 DATA_DIR = Path(__file__).resolve().parent / "seed_data"
 
+_CITY_COORDS: dict[str, tuple[float, float, str, str]] = {
+    "Goa": (15.2993, 74.1240, "Goa", "India"),
+    "Jaipur": (26.9124, 75.7873, "Rajasthan", "India"),
+    "Bengaluru": (12.9716, 77.5946, "Karnataka", "India"),
+    "Coorg": (12.4244, 75.7382, "Karnataka", "India"),
+    "Udaipur": (24.5854, 73.7125, "Rajasthan", "India"),
+    "Rishikesh": (30.0869, 78.2676, "Uttarakhand", "India"),
+    "Kochi": (9.9312, 76.2673, "Kerala", "India"),
+    "Mumbai": (19.0760, 72.8777, "Maharashtra", "India"),
+    "Manali": (32.2396, 77.1887, "Himachal Pradesh", "India"),
+    "Chennai": (13.0827, 80.2707, "Tamil Nadu", "India"),
+    "Puducherry": (11.9416, 79.8083, "Puducherry", "India"),
+}
+
+# Verified Unsplash URLs (same pool as stay listings in listings.json)
+_CATALOG_IMAGE_URLS: list[str] = [
+    "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=800&q=70&auto=format",
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=70&auto=format",
+    "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=800&q=70&auto=format",
+    "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=70&auto=format",
+    "https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=800&q=70&auto=format",
+    "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800&q=70&auto=format",
+    "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=70&auto=format",
+    "https://images.unsplash.com/photo-1567157577867-05ccb1388e66?w=800&q=70&auto=format",
+]
+
+# category, title, city, price_per_night (INR), host email
+_CATALOG_SPECS: list[tuple[str, str, str, int, str]] = [
+    ("Experiences", "Sunset kayak tour on the backwaters", "Goa", 2800, "ananya.mehta@example.com"),
+    ("Experiences", "Old city food walk with a local chef", "Jaipur", 1900, "arjun.deshmukh@example.com"),
+    ("Experiences", "Pottery workshop in an artist studio", "Bengaluru", 2200, "meera.iyer@example.com"),
+    ("Experiences", "Tea tasting in the Nilgiri hills", "Coorg", 3500, "rohan.kapoor@example.com"),
+    ("Experiences", "Photography walk at golden hour", "Udaipur", 2400, "meera.iyer@example.com"),
+    ("Experiences", "Cooking class: coastal spices", "Kochi", 2600, "ananya.mehta@example.com"),
+    ("Experiences", "Private sunrise yoga on the beach", "Goa", 3200, "ananya.mehta@example.com"),
+    ("Experiences", "Vintage car tour of pink streets", "Jaipur", 4500, "arjun.deshmukh@example.com"),
+    ("Experiences", "Sound healing in a forest cabin", "Manali", 3800, "rohan.kapoor@example.com"),
+    ("Experiences", "Block printing with master artisans", "Jaipur", 2900, "arjun.deshmukh@example.com"),
+    ("Experiences", "River rafting with certified guides", "Rishikesh", 3400, "rohan.kapoor@example.com"),
+    ("Experiences", "Coffee estate walk at sunrise", "Coorg", 2100, "rohan.kapoor@example.com"),
+    ("Experiences", "Street food crawl after dark", "Mumbai", 1700, "meera.iyer@example.com"),
+    ("Experiences", "Wine pairing in a heritage haveli", "Udaipur", 4200, "arjun.deshmukh@example.com"),
+    ("Experiences", "Farm-to-table lunch in the hills", "Manali", 2300, "rohan.kapoor@example.com"),
+    ("Experiences", "Seafood cooking on the beach", "Goa", 2500, "ananya.mehta@example.com"),
+    ("Services", "Editorial fashion portraits by Irfan", "Chennai", 2000, "meera.iyer@example.com"),
+    ("Services", "Home chef: South Indian tasting menu", "Chennai", 3500, "ananya.mehta@example.com"),
+    ("Services", "Deep tissue massage at your stay", "Chennai", 1800, "ananya.mehta@example.com"),
+    ("Services", "Personal training — strength & mobility", "Chennai", 1500, "rohan.kapoor@example.com"),
+    ("Services", "Bridal makeup & hair styling", "Chennai", 4200, "meera.iyer@example.com"),
+    ("Services", "Event catering for small gatherings", "Chennai", 5000, "ananya.mehta@example.com"),
+    ("Services", "Beachside portrait session", "Puducherry", 2200, "meera.iyer@example.com"),
+    ("Services", "French-Indian fusion chef", "Puducherry", 3200, "ananya.mehta@example.com"),
+    ("Services", "Ayurvedic spa treatment", "Puducherry", 2800, "ananya.mehta@example.com"),
+    ("Services", "Yoga & breathwork coaching", "Puducherry", 1600, "rohan.kapoor@example.com"),
+    ("Services", "Family portrait session in the city", "Puducherry", 1900, "meera.iyer@example.com"),
+    ("Services", "Sunset photography on the beach", "Goa", 2400, "ananya.mehta@example.com"),
+    ("Services", "Private chef: Goan seafood feast", "Goa", 3800, "ananya.mehta@example.com"),
+    ("Services", "In-villa massage & wellness", "Goa", 2000, "ananya.mehta@example.com"),
+    ("Services", "Personal trainer — beach workouts", "Goa", 1400, "rohan.kapoor@example.com"),
+]
+
+
+def _catalog_listing_rows() -> list[dict]:
+    rows: list[dict] = []
+    for index, (category, title, city, price, host_email) in enumerate(_CATALOG_SPECS):
+        lat, lng, state, country = _CITY_COORDS[city]
+        image = _CATALOG_IMAGE_URLS[index % len(_CATALOG_IMAGE_URLS)]
+        rows.append(
+            {
+                "title": title,
+                "description": (
+                    f"{title} in {city}. Host-led session for small groups. "
+                    "Same booking and checkout flow as stays on the platform."
+                ),
+                "property_type": "house",
+                "room_type": "entire_place",
+                "category": category,
+                "address": f"Meet-up in {city}",
+                "city": city,
+                "state": state,
+                "country": country,
+                "lat": lat,
+                "lng": lng,
+                "max_guests": 10,
+                "bedrooms": 0,
+                "beds": 1,
+                "bathrooms": 1,
+                "price_per_night": price,
+                "cleaning_fee": 0,
+                "amenities": ["Wifi"],
+                "images": [image],
+                "host_email": host_email,
+                "instant_book": True,
+            }
+        )
+    return rows
+
 
 def rating_one_decimal(total: int, count: int) -> float:
     quantized = (Decimal(total) / Decimal(count)).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP)
@@ -69,6 +173,12 @@ def _load_json(name: str) -> list[dict]:
 
 
 def _clear(db: Session) -> None:
+    db.execute(delete(ExperienceReview))
+    db.execute(delete(ExperienceBooking))
+    db.execute(delete(ExperienceSlot))
+    db.execute(delete(ExperienceItineraryItem))
+    db.execute(delete(ExperienceImage))
+    db.execute(delete(Experience))
     db.execute(delete(Review))
     db.execute(delete(BookingCompanion))
     db.execute(delete(Booking))
@@ -486,6 +596,7 @@ def run_seed(reset: bool = False) -> None:
         amenities = _create_amenities(db, _load_json("amenities.json"))
         profile_count = _create_host_profiles(db, users)
         listings = _create_listings(db, _load_json("listings.json"), users, amenities)
+        listings.extend(_create_listings(db, _catalog_listing_rows(), users, amenities))
         _create_coupons(db)
         wishlist_count = _create_wishlists(db, users, listings)
         guests = [user for user in users.values() if not user.is_host]
@@ -493,6 +604,7 @@ def run_seed(reset: bool = False) -> None:
         bookings = _create_bookings(db, rng, listings, guests, today)
         review_count = _add_reviews(db, rng, bookings, _load_json("reviews.json"), today)
         _refresh_listing_ratings(db)
+        exp_count, slot_count, exp_bookings = seed_experiences(db, users, guests)
         db.commit()
 
         cancelled = sum(booking.status == BookingStatus.cancelled for booking in bookings)
@@ -503,7 +615,8 @@ def run_seed(reset: bool = False) -> None:
             f"{len(listings)} listings, "
             f"{wishlist_count} wishlists, {len(bookings)} bookings "
             f"({cancelled} cancelled, {pending} pending, {declined} declined), "
-            f"{review_count} reviews, 2 coupons."
+            f"{review_count} reviews, 2 coupons, "
+            f"{exp_count} experiences, {slot_count} slots, {exp_bookings} experience bookings."
         )
     except Exception:
         db.rollback()

@@ -76,6 +76,20 @@ class DiscountType(str, enum.Enum):
     monthly = "monthly"
 
 
+class ExperienceCategory(str, enum.Enum):
+    shopping_fashion = "shopping_fashion"
+    food = "food"
+    art = "art"
+    nature = "nature"
+    history = "history"
+    wellness = "wellness"
+
+
+class ExperienceBookingStatus(str, enum.Enum):
+    confirmed = "confirmed"
+    cancelled = "cancelled"
+
+
 def str_enum(enum_cls: type[enum.Enum], length: int = 32) -> Enum:
     return Enum(
         enum_cls,

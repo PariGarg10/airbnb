@@ -7,7 +7,7 @@ import { Header } from "@/components/layout/Header";
 
 export function AppChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const bookDesktop = pathname.startsWith("/book");
+  const bookDesktop = pathname.startsWith("/book") || /^\/experiences\/\d+\/book/.test(pathname);
   if (pathname.startsWith("/host")) return <>{children}</>;
   if (pathname.startsWith("/legal") || pathname.startsWith("/help")) {
     return <div className="flex min-h-screen flex-col">{children}</div>;

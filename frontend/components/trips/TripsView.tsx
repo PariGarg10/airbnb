@@ -18,7 +18,9 @@ import { ApiError, bookingsApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { formatDateRange, formatInr } from "@/lib/format";
 import { pendingExpiresLabel } from "@/lib/trips/pendingExpiry";
+import { formatExperienceDateLong, formatExperienceTimeRange } from "@/lib/experienceDatetime";
 import type { Booking } from "@/types";
+import type { ExperienceBookingSummary } from "@/types/experience";
 
 function nights(checkIn: string, checkOut: string): number {
   return differenceInCalendarDays(parseISO(checkOut), parseISO(checkIn));
@@ -50,11 +52,16 @@ export function TripsView() {
   }, [isLoading, user]);
 
   const data = trips.data;
+  const experiences = data?.experiences ?? { upcoming: [], past: [], cancelled: [] };
   const allTrips = useMemo(
     () => [...(data?.pending ?? []), ...(data?.upcoming ?? []), ...(data?.past ?? []), ...(data?.cancelled ?? [])],
     [data],
   );
-  const empty = data && data.pending.length + data.upcoming.length + data.past.length + data.cancelled.length === 0;
+  const expCount =
+    experiences.upcoming.length + experiences.past.length + experiences.cancelled.length;
+  const empty =
+    data &&
+    data.pending.length + data.upcoming.length + data.past.length + data.cancelled.length + expCount === 0;
 
   if (!user) {
     return (
@@ -121,10 +128,13 @@ export function TripsView() {
             </section>
           ) : null}
 
-          {data.upcoming.length > 0 ? (
+          {data.upcoming.length > 0 || experiences.upcoming.length > 0 ? (
             <section>
               <h2 className="text-body font-semibold text-ink">Upcoming reservations</h2>
               <div className="mt-4 space-y-4">
+                {experiences.upcoming.map((trip) => (
+                  <ExperienceTripCard key={`exp-${trip.id}`} trip={trip} large />
+                ))}
                 {data.upcoming.map((trip) => (
                   <TripCard key={trip.id} trip={trip} large highlightId={highlightId} onHover={setHighlightId} />
                 ))}
@@ -132,10 +142,13 @@ export function TripsView() {
             </section>
           ) : null}
 
-          {data.past.length > 0 ? (
+          {data.past.length > 0 || experiences.past.length > 0 ? (
             <section>
               <h2 className="text-body font-semibold text-ink">Where you&apos;ve been</h2>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                {experiences.past.map((trip) => (
+                  <ExperienceTripCard key={`exp-${trip.id}`} trip={trip} compact />
+                ))}
                 {data.past.map((trip) => (
                   <div key={trip.id} className="space-y-2">
                     <TripCard trip={trip} highlightId={highlightId} onHover={setHighlightId} compact />
@@ -150,10 +163,13 @@ export function TripsView() {
             </section>
           ) : null}
 
-          {data.cancelled.length > 0 ? (
+          {data.cancelled.length > 0 || experiences.cancelled.length > 0 ? (
             <section>
               <h2 className="text-body font-semibold text-muted">Cancelled</h2>
               <div className="mt-4 grid gap-4 opacity-75 sm:grid-cols-2">
+                {experiences.cancelled.map((trip) => (
+                  <ExperienceTripCard key={`exp-${trip.id}`} trip={trip} compact greyed />
+                ))}
                 {data.cancelled.map((trip) => (
                   <TripCard key={trip.id} trip={trip} highlightId={highlightId} onHover={setHighlightId} compact greyed />
                 ))}
@@ -188,6 +204,40 @@ export function TripsView() {
       ) : null}
       <SwitchUserModal open={authOpen} onClose={() => setAuthOpen(false)} />
     </>
+  );
+}
+
+function ExperienceTripCard({
+  trip,
+  large,
+  compact,
+  greyed,
+}: {
+  trip: ExperienceBookingSummary;
+  large?: boolean;
+  compact?: boolean;
+  greyed?: boolean;
+}) {
+  const cover = trip.experience.cover_image;
+  return (
+    <Link
+      href={`/trips/experiences/${trip.id}`}
+      className={`block overflow-hidden rounded-2xl border border-hairline transition-shadow ${greyed ? "opacity-80" : ""}`}
+    >
+      <div className={large ? "relative aspect-[16/10] bg-soft" : "relative aspect-[4/3] bg-soft"}>
+        {cover ? <Image src={cover} alt="" fill className="object-cover" sizes={large ? "400px" : "200px"} /> : null}
+        <span className="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-label font-semibold">Experience</span>
+      </div>
+      <div className="p-4">
+        <p className="font-semibold text-ink">{trip.experience.city}</p>
+        <p className="text-meta text-muted">{trip.experience.title}</p>
+        <p className="mt-1 text-body text-ink">
+          {formatExperienceDateLong(trip.start_at)}
+          {!compact ? ` · ${formatExperienceTimeRange(trip.start_at, trip.end_at)}` : null}
+        </p>
+        {!compact ? <p className="mt-1 text-body font-medium">{formatInr(trip.total_snapshot)}</p> : null}
+      </div>
+    </Link>
   );
 }
 

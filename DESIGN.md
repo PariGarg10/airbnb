@@ -83,7 +83,7 @@ Header row `--header-h`: 80px, 96px at >=1440. Expanded header `--header-expande
 ### When panel (desktop ≥1128, `--when-panel-w` 850)
 - Centered under the bar (`left-1/2 -translate-x-1/2`, 12px gap), same `.search-panel` surface (radius 32, `--shadow-primary`, pop-in animation).
 - **Dates / Flexible toggle** (`.when-mode-toggle`): `#ebebeb` track, 4px padding; active tab white with `shadow-pill`; tabs 14/18/500, 8×20 padding.
-- **Calendar** (`.airbnb-calendar`, shared with listing desktop): two months; caption 16/20/600; weekdays 12/16/600 muted; day cells 48×48, 14/18 (600 on range ends); today = 1px `#222` ring; hover = same ring; past/disabled `#b0b0b0`; range middle `#f7f7f7` band; start/end solid `#222` discs with white label; nav chevrons 32px circles, disabled 25% opacity.
+- **Calendar** (`.airbnb-calendar`, shared with listing desktop): two months side by side (`.listing-dates`, `flex-wrap: nowrap`); caption 16/20/600; weekdays 12/16/600 muted; day cells `--calendar-day` 48×48 (shrink only when the column is narrower than `--calendar-pair-w`), 14/18 (600 on range ends); month gap `--calendar-months-gap` 32px; today = 1px `#222` ring; hover = same ring; past/disabled `#b0b0b0`; range middle `#f7f7f7` band; start/end solid `#222` discs with white label; nav chevrons 32px circles, disabled 25% opacity. Listing reserve popover is `--calendar-popover-w` (pair + 24px padding each side), aligned to the card’s right edge so both months stay visible.
 - **Flex chips** (`.when-flex-chip`): Exact dates + ±1…±14; white fill, 1px `--border`, active 2px `#222` (7×15 padding); row 24px below calendar.
 - **Flexible**: section titles `.t-when-section-title` 16/20/600; stay chips `.when-stay-chip` (same chip pattern as flex); month tiles 120×132, radius 16, 1px border, calendar icon 28px, month 14/500, year 12/16 muted; selected 2px `#222` (no fill tint); carousel nav 32px bordered circles.
 - **Search active**: bar `#ebebeb`, segment pills white + `shadow-pill`, Search control expands to `--search-btn-expanded` (118px) with label fade (`transition` `--spring-fast`).
@@ -159,3 +159,13 @@ Breakpoint: Airbnb switches layouts at **744px**, so Tailwind `md` starts at 744
 - Pill click: the header re-expands with the segment active and a full-width overlay `rgba(0,0,0,.25)` that fades in over 150ms linear (`.search-overlay`).
 
 Tools: `scripts/visual-audit/anim.cjs` (frame-by-frame collapse/expand) and `pillclick.cjs` (re-expanded state + overlay) record these values.
+
+## 13. Experience detail & booking (desktop ≥1128px)
+
+- **Layout:** Main column 712px gallery + content; right column highlights + sticky booking card (`rounded-[var(--r-12)]`, `--shadow-secondary`). Page max-width 1120px.
+- **Gallery:** 2×2 grid, 4px gaps (`gap-1`), outer corners `--r-12` (24px).
+- **Typography:** Page title 32px/600; section headings 32px/600; modal title “Select a time” 26px/600; day headers 18px/600.
+- **Select time modal:** 568px wide, 32px radius; slot cards `rounded-2xl`, 1px `#DDDDDD`, selected 2px `#222`; sticky footer with underlined total + black pill “Next”.
+- **Checkout:** Step cards `rounded-[var(--r-12)]`, 1px `#DDDDDD`; active step `--shadow-secondary`; back control 48px circle `#F7F7F7`; summary card padding 24px (`p-6`), 104px photo `rounded-xl`.
+- **Sticky sub-header:** 72px bar under `--header-h` when gallery scrolls away; 48px thumbnail.
+- **Category promo:** Panel on `#F7F7F7`; Fluent 3D icon from `/icons/*` (not wax seal).

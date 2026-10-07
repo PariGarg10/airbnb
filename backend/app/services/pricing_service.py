@@ -314,3 +314,35 @@ def compute_refund(
         lines=lines,
         policy_text=POLICY_TEXT,
     )
+
+
+@dataclass(frozen=True)
+class ExperienceQuoteLine:
+    label: str
+    amount: int
+
+
+@dataclass(frozen=True)
+class ExperienceQuote:
+    lines: tuple[ExperienceQuoteLine, ...]
+    total: int
+    cancellation_text: str
+
+
+def format_inr(amount: int) -> str:
+    return f"₹{amount:,}.00"
+
+
+def quote_experience(*, price_per_guest: int, adults: int, cancellation_text: str) -> ExperienceQuote:
+    line_total = price_per_guest * adults
+    guest_word = "adult" if adults == 1 else "adults"
+    label = f"{format_inr(price_per_guest)} x {adults} {guest_word}"
+    return ExperienceQuote(
+        lines=(ExperienceQuoteLine(label=label, amount=line_total),),
+        total=line_total,
+        cancellation_text=cancellation_text,
+    )
+
+
+def experience_refund_total(*, total: int, full: bool) -> int:
+    return total if full else 0

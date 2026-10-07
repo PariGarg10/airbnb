@@ -3,12 +3,17 @@
 import { ChevronLeft, ChevronRight, Heart, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { useAuth } from "@/lib/auth";
 import { formatInr, formatRating, formatResultsStayRange, propertyLabel } from "@/lib/format";
 import { useWishlist } from "@/hooks/useWishlist";
 import { isGuestFavourite } from "@/lib/isGuestFavourite";
-import { LISTING_CARD_SIZES, listingPhotoUrl } from "@/lib/listingPhotoUrl";
+import {
+  LISTING_CARD_SIZES,
+  LISTING_CARD_WIDTH,
+  LISTING_PHOTO_FALLBACK,
+  listingPhotoUrl,
+} from "@/lib/listingPhotoUrl";
 import type { ListingCard as ListingCardData } from "@/types";
 
 interface ListingCardProps {
@@ -40,6 +45,12 @@ export function ListingCard({
   const [heartBeat, setHeartBeat] = useState(0);
   const images = listing.images.length > 0 ? listing.images : [];
   const photo = images[index];
+  const [photoSrc, setPhotoSrc] = useState(() =>
+    photo ? listingPhotoUrl(photo, LISTING_CARD_WIDTH) : LISTING_PHOTO_FALLBACK,
+  );
+  useEffect(() => {
+    setPhotoSrc(photo ? listingPhotoUrl(photo, LISTING_CARD_WIDTH) : LISTING_PHOTO_FALLBACK);
+  }, [photo]);
   const guestFavourite = isGuestFavourite(listing);
   const placeName =
     listing.room_type === "private_room"
@@ -110,7 +121,7 @@ export function ListingCard({
       >
         {photo ? (
           <Image
-            src={listingPhotoUrl(photo)}
+            src={photoSrc}
             alt=""
             fill
             className="object-cover"
@@ -125,6 +136,9 @@ export function ListingCard({
             }
             priority={priority}
             loading={priority ? undefined : "lazy"}
+            onError={() => {
+              if (photoSrc !== LISTING_PHOTO_FALLBACK) setPhotoSrc(LISTING_PHOTO_FALLBACK);
+            }}
           />
         ) : (
           <div className="h-full w-full bg-[var(--image-placeholder)]" />

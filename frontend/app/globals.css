@@ -47,6 +47,12 @@
   --listing-nav-h: 64px;
   --listing-sidebar-w: 400px;
   --listing-main-gap: 80px;
+  /* Two-month date grid. Day cells stay 48px until the column is narrower than the pair. */
+  --calendar-day: 48px;
+  --calendar-months-gap: 32px;
+  --calendar-pair-w: calc(var(--calendar-day) * 14 + var(--calendar-months-gap));
+  --calendar-popover-pad: 24px;
+  --calendar-popover-w: calc(var(--calendar-pair-w) + var(--calendar-popover-pad) * 2);
   --border-elevated: 1px solid rgba(0, 0, 0, 0.04);
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --spring-fast: linear(0, 0.1856, 0.4653, 0.6823, 0.8223, 0.905, 0.9513, 0.9764, 0.9896, 0.9965, 1);
@@ -455,10 +461,10 @@ body {
   --rdp-range_end-color: #ffffff;
   --rdp-range_start-date-background-color: var(--text);
   --rdp-range_end-date-background-color: var(--text);
-  --rdp-day-height: 48px;
-  --rdp-day-width: 48px;
-  --rdp-day_button-height: 48px;
-  --rdp-day_button-width: 48px;
+  --rdp-day-height: var(--calendar-day);
+  --rdp-day-width: var(--calendar-day);
+  --rdp-day_button-height: var(--calendar-day);
+  --rdp-day_button-width: var(--calendar-day);
   --rdp-day_button-border-radius: 999px;
   --rdp-selected-border: 0;
   --rdp-disabled-opacity: 1;
@@ -481,6 +487,11 @@ body {
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
+}
+
+/* User-agent table padding is 1px and pushes each month past 7×48, which wraps the pair. */
+.airbnb-calendar .rdp-day {
+  padding: 0;
 }
 
 .airbnb-calendar .rdp-day_button {
@@ -1534,6 +1545,36 @@ a:hover > .tab-icon {
 /* Page overlay behind an open search: fades in over 150ms linear (measured; Airbnb transitions opacity .15s linear). */
 @keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
 .search-overlay { animation: overlay-in 150ms linear; }
+
+/* Listing page + reserve popover: October and November sit in one row. */
+.listing-dates {
+  container-type: inline-size;
+  width: 100%;
+}
+
+.listing-dates .airbnb-calendar {
+  width: max-content;
+  max-width: 100%;
+}
+
+.listing-dates .airbnb-calendar .rdp-root {
+  --rdp-months-gap: var(--calendar-months-gap);
+  --rdp-day-width: min(var(--calendar-day), calc((100cqi - var(--calendar-months-gap)) / 14));
+  --rdp-day-height: var(--rdp-day-width);
+  --rdp-day_button-width: var(--rdp-day-width);
+  --rdp-day_button-height: var(--rdp-day-width);
+}
+
+.listing-dates .airbnb-calendar .rdp-months {
+  flex-wrap: nowrap;
+  gap: var(--calendar-months-gap);
+  width: max-content;
+  max-width: 100%;
+}
+
+.reserve-dates-popover {
+  width: min(var(--calendar-popover-w), calc(100vw - 2rem));
+}
 
 .when-panel .airbnb-calendar {
   width: fit-content;

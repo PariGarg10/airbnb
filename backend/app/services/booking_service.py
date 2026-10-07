@@ -25,6 +25,7 @@ from app.services.booking_expiry import expire_stale_pending
 from app.services.coupon_service import claim_coupon, require_coupon
 from app.services.listing_pricing import confirmed_booking_count, quote_listing_stay
 from app.services.listing_service import has_date_conflict, validate_stay
+from app.services import experience_booking_service
 from app.services.pricing_service import (
     POLICY_TEXT,
     booking_price_fields,
@@ -114,11 +115,13 @@ def list_my_bookings(db: Session, guest: User) -> MyBookings:
     pending = [row for row in rows if row.status == BookingStatus.pending]
     past = [row for row in rows if row.status == BookingStatus.confirmed and row.check_out <= today]
     cancelled = [row for row in rows if row.status in _CLOSED_STATUSES]
+    experiences = experience_booking_service.list_my_bookings(db, guest)
     return MyBookings(
         upcoming=[_summary(row, guest) for row in sorted(upcoming, key=lambda row: (row.check_in, row.id))],
         pending=[_summary(row, guest) for row in sorted(pending, key=lambda row: (row.check_in, row.id))],
         past=[_summary(row, guest) for row in sorted(past, key=lambda row: (row.check_out, row.id), reverse=True)],
         cancelled=[_summary(row, guest) for row in sorted(cancelled, key=_closed_sort, reverse=True)],
+        experiences=experiences,
     )
 
 

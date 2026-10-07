@@ -32,6 +32,16 @@ import type {
   SavedListingIds,
   WishlistSummary,
 } from "@/types";
+import type {
+  ExperienceBookingCreate,
+  ExperienceBookingDetail,
+  ExperienceCard,
+  ExperienceDetail,
+  ExperienceMyBookings,
+  ExperienceQuote,
+  ExperienceQuoteRequest,
+  ExperienceSlotsByDate,
+} from "@/types/experience";
 
 export const USER_ID_STORAGE_KEY = "airbnb_user_id";
 
@@ -236,6 +246,25 @@ export const wishlistApi = {
     request<void>(`/api/wishlists/${wishlistId}/items/${listingId}`, { method: "POST" }),
   removeItem: (wishlistId: number, listingId: number) =>
     request<void>(`/api/wishlists/${wishlistId}/items/${listingId}`, { method: "DELETE" }),
+};
+
+export const experiencesApi = {
+  list: (params: { city?: string; category?: string } = {}) =>
+    request<ExperienceCard[]>(`/api/experiences${toQuery(params)}`, { cacheMode: "public" }),
+  get: (id: number) => request<ExperienceDetail>(`/api/experiences/${id}`, { cacheMode: "public" }),
+  slots: (id: number, params: { from?: string; to?: string; guests?: number } = {}) =>
+    request<ExperienceSlotsByDate[]>(`/api/experiences/${id}/slots${toQuery(params)}`, { cacheMode: "public" }),
+  quote: (body: ExperienceQuoteRequest) =>
+    request<ExperienceQuote>("/api/experiences/quote", { method: "POST", body: JSON.stringify(body) }),
+};
+
+export const experienceBookingsApi = {
+  create: (body: ExperienceBookingCreate) =>
+    request<ExperienceBookingDetail>("/api/experience-bookings", { method: "POST", body: JSON.stringify(body) }),
+  mine: () => request<ExperienceMyBookings>("/api/experience-bookings/me"),
+  get: (bookingId: number) => request<ExperienceBookingDetail>(`/api/experience-bookings/${bookingId}`),
+  cancel: (bookingId: number) =>
+    request<ExperienceBookingDetail>(`/api/experience-bookings/${bookingId}/cancel`, { method: "POST" }),
 };
 
 export const reviewsApi = {

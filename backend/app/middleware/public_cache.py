@@ -10,6 +10,8 @@ PUBLIC_CACHE = "public, max-age=60"
 def _is_public_listing_get(path: str) -> bool:
     if path in ("/api/amenities", "/api/categories"):
         return True
+    if path.startswith("/api/experiences") and path != "/api/experiences/quote":
+        return True
     if not path.startswith("/api/listings"):
         return False
     if path.endswith("/quote"):

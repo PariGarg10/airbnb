@@ -29,7 +29,7 @@ export function ListingLocationSection({
   const locationLine = [city, state, country].filter(Boolean).join(", ");
 
   return (
-    <section id="location">
+    <section id="location" className="scroll-mt-[var(--listing-nav-h)]">
       <h2 className="t-heading min-[1128px]:text-[22px] min-[1128px]:leading-[26px] min-[1128px]:tracking-[-0.0275rem]">
         Where you&apos;ll be
       </h2>

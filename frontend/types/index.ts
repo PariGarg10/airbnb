@@ -1,3 +1,5 @@
+import type { ExperienceMyBookings } from "@/types/experience";
+
 export type PropertyType =
   | "house"
   | "apartment"
@@ -382,6 +384,7 @@ export interface MyBookings {
   pending: Booking[];
   past: Booking[];
   cancelled: Booking[];
+  experiences: ExperienceMyBookings;
 }
 
 export interface ReviewAuthor {

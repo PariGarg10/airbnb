@@ -3,6 +3,7 @@ from datetime import date, datetime
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.models.enums import BookingStatus, CancelReason, CancelledBy, PaymentMethodType
+from app.schemas.experience import ExperienceMyBookings
 from app.schemas.listing import CouponOut, DiscountOut
 
 
@@ -151,3 +152,4 @@ class MyBookings(BaseModel):
     pending: list[BookingSummary]
     past: list[BookingSummary]
     cancelled: list[BookingSummary]
+    experiences: ExperienceMyBookings

@@ -134,7 +134,7 @@ def test_search_by_location_is_case_insensitive(api):
     card = body["items"][0]
     assert card["id"] == goa.id
     assert card["city"] == "Goa"
-    assert card["images"] == [f"https://example.com/{position}.jpg" for position in range(5)]
+    assert card["images"] == ["https://example.com/0.jpg"]
     assert card["host_is_superhost"] is True
     assert card["is_wishlisted"] is False
 

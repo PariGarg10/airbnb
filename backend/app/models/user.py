@@ -49,3 +49,15 @@ class User(CreatedAtMixin, Base):
         cascade="all, delete-orphan",
         uselist=False,
     )
+    experiences: Mapped[list["Experience"]] = relationship(
+        back_populates="host",
+        passive_deletes="all",
+    )
+    experience_bookings: Mapped[list["ExperienceBooking"]] = relationship(
+        back_populates="guest",
+        passive_deletes="all",
+    )
+    experience_reviews: Mapped[list["ExperienceReview"]] = relationship(
+        back_populates="author",
+        passive_deletes="all",
+    )

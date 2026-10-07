@@ -237,7 +237,7 @@ export function ReserveCard({ listing, disabledRanges, onDatesChange }: ReserveC
 
           {datesOpen ? (
             <div
-              className={`dropdown-pop absolute left-0 right-0 z-50 overflow-y-auto overscroll-contain rounded-[var(--r-16)] border border-hairline bg-white p-6 shadow-[var(--shadow-primary)] ${
+              className={`reserve-dates-popover dropdown-pop absolute right-0 z-50 overflow-x-hidden overflow-y-auto overscroll-contain rounded-[var(--r-16)] border border-hairline bg-white p-6 shadow-[var(--shadow-primary)] ${
                 datesPopover.placement === "above" ? "bottom-full mb-3" : "top-full mt-3"
               }`}
               style={{ maxHeight: datesPopover.maxHeight }}
@@ -250,15 +250,17 @@ export function ReserveCard({ listing, disabledRanges, onDatesChange }: ReserveC
                   <p className="mt-1 text-sm leading-[18px] text-muted">{formatListingStaySubtitle(checkIn, checkOut)}</p>
                 ) : null}
               </div>
-              <DateRangePicker
-                checkIn={checkIn}
-                checkOut={checkOut}
-                disabledRanges={disabledRanges}
-                onChange={onDatesChange}
-                layout="listing-popover"
-                monthCount={2}
-                onClose={() => setDatesOpen(false)}
-              />
+              <div className="listing-dates">
+                <DateRangePicker
+                  checkIn={checkIn}
+                  checkOut={checkOut}
+                  disabledRanges={disabledRanges}
+                  onChange={onDatesChange}
+                  layout="listing-popover"
+                  monthCount={2}
+                  onClose={() => setDatesOpen(false)}
+                />
+              </div>
             </div>
           ) : null}
 

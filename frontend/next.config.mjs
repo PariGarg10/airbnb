@@ -7,6 +7,9 @@ const nextConfig = {
       ? process.env.NEXT_DIST_DIR
       : ".next",
   images: {
+    minimumCacheTTL: 86400,
+    deviceSizes: [384, 640, 750, 828, 1080],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
       { protocol: "https", hostname: "i.pravatar.cc", pathname: "/**" },

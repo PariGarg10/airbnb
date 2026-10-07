@@ -1,6 +1,6 @@
 import { ProductCatalogPage } from "@/components/catalog/ProductCatalogPage";
-import { EXPERIENCE_SECTIONS } from "@/lib/mock/experiences";
+import { EXPERIENCE_SECTIONS } from "@/lib/catalogSections";
 
 export default function ExperiencesPage() {
-  return <ProductCatalogPage sections={EXPERIENCE_SECTIONS} />;
+  return <ProductCatalogPage category="Experiences" sections={EXPERIENCE_SECTIONS} />;
 }

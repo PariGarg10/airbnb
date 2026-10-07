@@ -31,12 +31,27 @@ Money fields are integer currency units. `check_in` is inclusive and `check_out`
 | GET | `/api/amenities` | No | — | Catalog: `id`, `name`, `icon`, `group_name` |
 | GET | `/api/categories` | No | — | Active listings grouped by category: `category`, `listing_count` |
 
+## Experiences
+
+Time-slot experiences use per-guest pricing with no service fee or taxes. Quotes and bookings snapshot `price_per_guest` and `total`.
+
+| Method | Path | Auth | Request | Response |
+| --- | --- | --- | --- | --- |
+| GET | `/api/experiences` | No | Query: optional `city`, `category` (`shopping_fashion`, `food`, `art`, `nature`, `history`, `wellness`) | Cards: `id`, `title`, `city`, `avg_rating`, `review_count`, `price_per_guest`, `cover_image`, `category` |
+| GET | `/api/experiences/{id}` | No | — | Detail: images, host, itinerary, meeting point, things to know, first 6 reviews, `review_total`. 404 when missing or inactive |
+| GET | `/api/experiences/{id}/slots` | No | Query: `from`, `to` (dates), `guests` (default 1) | Slots grouped by `date`: `{date, slots:[{id, start_at, end_at, spots_left, price_per_guest, private_available}]}`. Past, cancelled, and full slots are omitted |
+| POST | `/api/experiences/quote` | No | `slot_id`, `adults` (≥ 1) | `lines` (`label`, `amount`), `total`, `cancellation_text` (full refund if cancelled before start minus `cancellation_hours`, IST). 404 invalid slot, 409 when full |
+| POST | `/api/experience-bookings` | Yes | `slot_id`, `adults`, optional mocked payment (`payment_method_type`, `card_brand`, `card_last4`) | 201 confirmed booking with snapshots and `confirmation_code` (`EX` + 8). Uses `BEGIN IMMEDIATE` and increments `booked_count`. 409 `This time is no longer available` when full |
+| GET | `/api/experience-bookings/me` | Yes | — | `upcoming`, `past`, `cancelled` experience booking summaries |
+| GET | `/api/experience-bookings/{id}` | Yes | — | Booking detail. Guest only. 403 otherwise |
+| POST | `/api/experience-bookings/{id}/cancel` | Yes | — | Cancelled booking; full refund if still inside the cancellation window, else `refund_amount` 0; decrements `booked_count`. Guest only |
+
 ## Bookings
 
 | Method | Path | Auth | Request | Response |
 | --- | --- | --- | --- | --- |
 | POST | `/api/bookings` | Yes | `listing_id`, `check_in`, `check_out`, and either `num_guests` or `adults` (optional `children`, `infants` ≤ 5, `pets` ≤ 5). Optional `message_to_host`, `coupon_code`, `payment_method_type` (`card` \| `upi` \| `netbanking`), `card_brand`, `card_last4` (4 digits). Never send a card number | 201 booking detail. Price fields, taxes, and coupon are a snapshot. `instant` listings are `confirmed`. `approve_first_5` is `pending` until the listing has 5 confirmed bookings, then `confirmed`. A pending request requires `message_to_host`. Capacity is adults + children ≤ `max_guests` (infants do not count). Pets only when `allows_pets`. 400 invalid stay, pets, or coupon, 403 own listing, 404 missing or inactive listing, 409 overlapping pending or confirmed stay |
-| GET | `/api/bookings/me` | Yes | — | `upcoming` (confirmed, checkout after today, check-in ascending), `pending` (check-in ascending), `past` (confirmed, checkout on or before today, descending), `cancelled` (cancelled, declined, or expired, descending). Each item is a booking summary plus `listing` (`id`, `title`, `city`, `country`, `cover_image`, `host_name`, `host_avatar`, `lat`, `lng`), `created_at`, and `can_review` when eligible. Stale pending requests expire on this read |
+| GET | `/api/bookings/me` | Yes | — | Stay lists: `upcoming`, `pending`, `past`, `cancelled` (same rules as before). Each stay item includes `listing`, `created_at`, `can_review`. Also `experiences` with `upcoming`, `past`, and `cancelled` experience booking summaries for Trips. Stale pending stay requests expire on this read |
 | GET | `/api/bookings/{id}` | Yes | — | Full detail: guest breakdown, `message_to_host`, price snapshot lines, `confirmation_code`, `status`, `can_cancel`, `can_review`, `cancellation_policy_text`, check-in `15:00`, checkout `11:00`, host `{name, avatar, joined_year}`, companions. The listing address is included only when `confirmed`; otherwise the city only. Guest or listing host. 403 otherwise, 404 when missing |
 | GET | `/api/bookings/{id}/cancellation-preview` | Yes | — | `refund_amount`, `non_refundable_amount`, `lines` (`label`, `amount`), `policy_text`. Full refund at least 24 hours before check-in at 15:00 (taxes and service fee included). Otherwise, before check-in, 50% of the nightly total plus tax on that part, and the cleaning fee. A pending request is a full refund. Guest only, and only while the stay can still be cancelled. 400 otherwise, 403 for anyone else |
 | POST | `/api/bookings/{id}/cancel` | Yes | `reason`: `plans_changed` \| `found_another_place` \| `travel_restrictions` \| `host_asked` \| `personal_emergency` \| `other` | The booking, now `cancelled`, with `refund_amount`, `cancel_reason`, `cancelled_at`, and `cancelled_by` = `guest`. Only the guest, only while pending or confirmed, and only before the check-in date. 400 otherwise, 403 for anyone else |

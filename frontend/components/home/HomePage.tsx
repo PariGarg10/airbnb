@@ -1,6 +1,6 @@
 "use client";
 
-import { useQueries } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,10 +9,10 @@ import { SwitchUserModal } from "@/components/auth/SwitchUserModal";
 import { ArrowButton, SeeAllTile, searchHref, useRowScroller } from "@/components/home/homeRowUi";
 import { ListingCard } from "@/components/listings/ListingCard";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { listingsApi } from "@/lib/api";
 import { APP_NAME } from "@/lib/brand";
 import { DESTINATIONS } from "@/lib/destinations";
-import { listingPhotoUrl } from "@/lib/listingPhotoUrl";
+import { fetchListingSearchesBatched } from "@/lib/batchedListings";
+import { LISTING_THUMB_WIDTH, listingPhotoUrl } from "@/lib/listingPhotoUrl";
 import type { ListingCard as ListingCardData, ListingSearchParams } from "@/types";
 
 const COVER_FALLBACKS: Record<string, string> = {
@@ -29,10 +29,6 @@ const COVER_FALLBACKS: Record<string, string> = {
   Tokyo: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&q=60",
   Santorini: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=400&q=60",
 };
-
-function bestCover(items: ListingCardData[]) {
-  return [...items].sort((a, b) => b.avg_rating - a.avg_rating || b.review_count - a.review_count)[0];
-}
 
 function RowSkeleton() {
   return (
@@ -129,90 +125,61 @@ export function HomePage() {
       {
         id: "goa",
         title: "Guest favourite homes in Goa",
-        params: { location: "Goa", page_size: 18 } satisfies ListingSearchParams,
+        params: { location: "Goa", page_size: 12 } satisfies ListingSearchParams,
       },
       {
         id: "manali",
         title: "Popular homes in Manali",
-        params: { location: "Manali", page_size: 18 } satisfies ListingSearchParams,
+        params: { location: "Manali", page_size: 12 } satisfies ListingSearchParams,
       },
       {
         id: "jaipur",
         title: "Guest favourite homes in Jaipur",
-        params: { location: "Jaipur", page_size: 18 } satisfies ListingSearchParams,
+        params: { location: "Jaipur", page_size: 12 } satisfies ListingSearchParams,
       },
       {
         id: "udaipur",
         title: "Popular homes in Udaipur",
-        params: { location: "Udaipur", page_size: 18 } satisfies ListingSearchParams,
+        params: { location: "Udaipur", page_size: 12 } satisfies ListingSearchParams,
       },
       {
         id: "rishikesh",
         title: "Stays in Rishikesh",
-        params: { location: "Rishikesh", page_size: 18 } satisfies ListingSearchParams,
+        params: { location: "Rishikesh", page_size: 12 } satisfies ListingSearchParams,
       },
       {
         id: "coorg",
         title: "Homes in Coorg",
-        params: { location: "Coorg", page_size: 18 } satisfies ListingSearchParams,
+        params: { location: "Coorg", page_size: 12 } satisfies ListingSearchParams,
       },
       {
         id: "munnar",
         title: "Popular stays in Munnar",
-        params: { location: "Munnar", page_size: 18 } satisfies ListingSearchParams,
+        params: { location: "Munnar", page_size: 12 } satisfies ListingSearchParams,
       },
       {
         id: "mumbai",
         title: "Popular homes in Mumbai",
-        params: { location: "Mumbai", page_size: 18 } satisfies ListingSearchParams,
+        params: { location: "Mumbai", page_size: 12 } satisfies ListingSearchParams,
       },
       {
         id: "bali",
         title: "Guest favourite homes in Bali",
-        params: { location: "Bali", page_size: 18 } satisfies ListingSearchParams,
-      },
-      {
-        id: "lisbon",
-        title: "Homes in Lisbon",
-        params: { location: "Lisbon", page_size: 18 } satisfies ListingSearchParams,
-      },
-      {
-        id: "tokyo",
-        title: "Stays in Tokyo",
-        params: { location: "Tokyo", page_size: 18 } satisfies ListingSearchParams,
-      },
-      {
-        id: "santorini",
-        title: "Guest favourites in Santorini",
-        params: { location: "Santorini", page_size: 18 } satisfies ListingSearchParams,
+        params: { location: "Bali", page_size: 12 } satisfies ListingSearchParams,
       },
     ],
     [],
   );
 
-  const coverQueries = useMemo(
-    () =>
-      cities.map((city) => ({
-        queryKey: ["home-cover", city.query],
-        queryFn: () => listingsApi.search({ location: city.query, page_size: 20 }),
-      })),
-    [cities],
-  );
-  const rowQueries = useMemo(
-    () =>
-      rows.map((row) => ({
-        queryKey: ["home-row", row.id, row.params],
-        queryFn: () => listingsApi.search(row.params),
-      })),
-    [rows],
-  );
-
-  const covers = useQueries({ queries: coverQueries });
-  const listingRows = useQueries({ queries: rowQueries });
+  const homeRows = useQuery({
+    queryKey: ["home-rows", rows.map((row) => row.id)],
+    queryFn: () => fetchListingSearchesBatched(rows.map((row) => row.params), 3),
+    staleTime: 60_000,
+  });
 
   return (
     <main className="container-home space-y-6 pb-12 md:space-y-10 md:pt-[54px]">
-      <DestinationRow cities={cities} covers={covers} />
+      <DestinationRow cities={cities} />
 
       <section className="promo-row no-scrollbar">
         {PROMOS.map((promo) => {
@@ -231,11 +198,18 @@ export function HomePage() {
         })}
       </section>
 
+      {homeRows.isError ? (
+        <section className="py-8">
+          <h2 className="t-section-title">Could not load home rows</h2>
+          <button type="button" className="mt-4 t-link" onClick={() => homeRows.refetch()}>
+            Try again
+          </button>
+        </section>
+      ) : null}
       {rows.map((row, index) => {
-        const query = listingRows[index];
-        if (!query || query.isLoading) return <RowSkeleton key={row.id} />;
-        const items = query.data?.items ?? [];
-        if (query.isError || items.length === 0) return null;
+        if (homeRows.isLoading) return <RowSkeleton key={row.id} />;
+        const items = homeRows.data?.[index] ?? [];
+        if (items.length === 0) return null;
         return (
           <ListingRow
             key={row.id}
@@ -263,7 +237,7 @@ function CoverPhoto({ src, alt }: { src?: string; alt: string }) {
   }
   return (
     <Image
-      src={listingPhotoUrl(current, 400)}
+      src={listingPhotoUrl(current, LISTING_THUMB_WIDTH)}
       alt=""
       fill
       className="object-cover"
@@ -276,13 +250,7 @@ function CoverPhoto({ src, alt }: { src?: string; alt: string }) {
   );
 }
 
-function DestinationRow({
-  cities,
-  covers,
-}: {
-  cities: { id: string; title: string; subtitle: string; query: string }[];
-  covers: { isLoading: boolean; isError: boolean; data?: { items: ListingCardData[] } }[];
-}) {
+function DestinationRow({ cities }: { cities: { id: string; title: string; subtitle: string; query: string }[] }) {
   const { ref, edges, scrollPage } = useRowScroller(cities.length);
   return (
     <section>
@@ -299,28 +267,15 @@ function DestinationRow({
         </div>
       </div>
       <div ref={ref} className="dest-row no-scrollbar flex snap-x gap-3 overflow-x-auto">
-        {cities.map((city, index) => {
-          const query = covers[index];
-          if (!query || query.isLoading) {
-            return (
-              <div key={city.id} className="w-[clamp(92px,11vw,124px)] shrink-0">
-                <Skeleton className="aspect-square w-full rounded-xl" />
-                <Skeleton className="mt-2 h-4 w-16" />
-                <Skeleton className="mt-2 h-3 w-24" />
-              </div>
-            );
-          }
-          const cover = query.isError ? undefined : bestCover(query.data?.items ?? []);
-          return (
-            <Link key={city.id} href={searchHref({ location: city.query })} className="w-[clamp(92px,11vw,124px)] shrink-0 snap-start">
-              <span className="relative block aspect-square w-full overflow-hidden rounded-xl bg-soft">
-                <CoverPhoto src={cover?.images[0] || COVER_FALLBACKS[city.title]} alt={city.title} />
-              </span>
-              <span className="t-destination-name mt-2 block truncate">{city.title}</span>
-              <span className="t-destination-tag block truncate">{city.subtitle}</span>
-            </Link>
-          );
-        })}
+        {cities.map((city) => (
+          <Link key={city.id} href={searchHref({ location: city.query })} className="w-[clamp(92px,11vw,124px)] shrink-0 snap-start">
+            <span className="relative block aspect-square w-full overflow-hidden rounded-xl bg-soft">
+              <CoverPhoto src={COVER_FALLBACKS[city.title]} alt={city.title} />
+            </span>
+            <span className="t-destination-name mt-2 block truncate">{city.title}</span>
+            <span className="t-destination-tag block truncate">{city.subtitle}</span>
+          </Link>
+        ))}
       </div>
     </section>
   );

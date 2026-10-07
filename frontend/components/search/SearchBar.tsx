@@ -233,13 +233,13 @@ export function GuestSearch({
       params.set("check_out", draft.checkOut);
     }
     if (guests > 0) params.set("guests", String(guests));
-    if (searchProduct === "experiences" || searchProduct === "services") {
-      onClose();
-      setMobileOpen(false);
-      return;
+    if (searchProduct === "experiences") {
+      params.set("category", "Experiences");
+    } else if (searchProduct === "services") {
+      params.set("category", "Services");
     }
     const query = params.toString();
-    router.push(query ? `/s?${query}` : "/s");
+    router.push(query ? `/s?${query}` : searchProduct === "experiences" ? "/s?category=Experiences" : searchProduct === "services" ? "/s?category=Services" : "/s");
     onClose();
     setMobileOpen(false);
   };
@@ -597,15 +597,17 @@ export function ExpandedSearch() {
     const onPointer = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null;
       if (target?.closest("[data-guest-search]")) return;
+      // Close on click, not mousedown. Closing earlier collapses the bar before
+      // the click lands, so Homes (and the logo) reopen the search field instead.
       close();
     };
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") close();
     };
-    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("click", onPointer);
     document.addEventListener("keydown", onKey);
     return () => {
-      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("click", onPointer);
       document.removeEventListener("keydown", onKey);
     };
   }, [close, segment]);
@@ -621,11 +623,16 @@ export function ExpandedSearch() {
         onMouseLeave={() => setHover(null)}
       >
         <div aria-hidden className={`search-bar-outline ${segment ? "opacity-0" : ""}`} style={{ gridColumn: "1 / -1", gridRow: 1 }} />
-        <button
-          type="button"
+        <div
+          role="button"
+          tabIndex={0}
           onMouseEnter={() => setHover("where")}
           onClick={() => open("where")}
-          className={`search-seg search-seg-where relative z-10 flex min-w-0 items-center overflow-hidden rounded-[var(--r-search-segment)] px-8 text-left ${active("where") ? "bg-white shadow-pill" : "hover:bg-divider"}`}
+          onKeyDown={(event) => {
+            if (event.target !== event.currentTarget) return;
+            if (event.key === "Enter" || event.key === " ") open("where");
+          }}
+          className={`search-seg search-seg-where relative z-10 flex min-w-0 cursor-pointer items-center overflow-hidden rounded-[var(--r-search-segment)] px-8 text-left ${active("where") ? "bg-white shadow-pill" : "hover:bg-divider"}`}
         >
           <span className="min-w-0 flex-1">
             <span className="t-search-label block pb-0.5">Where</span>
@@ -645,13 +652,17 @@ export function ExpandedSearch() {
             )}
           </span>
           {active("where") && search.whereFilled ? <ClearButton label="Clear where" onClick={() => clearSegment("where")} /> : null}
-        </button>
+        </div>
         <span className={`search-divider ${dividerHidden("where", "when") ? "opacity-0" : ""}`} />
-        <button
-          type="button"
+        <div
+          role="button"
+          tabIndex={0}
           onMouseEnter={() => setHover("when")}
           onClick={() => open("when")}
-          className={`search-seg search-seg-when relative z-10 flex min-w-0 items-center overflow-hidden rounded-[var(--r-search-segment)] px-6 text-left ${active("when") ? "bg-white shadow-pill" : "hover:bg-divider"}`}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") open("when");
+          }}
+          className={`search-seg search-seg-when relative z-10 flex min-w-0 cursor-pointer items-center overflow-hidden rounded-[var(--r-search-segment)] px-6 text-left ${active("when") ? "bg-white shadow-pill" : "hover:bg-divider"}`}
         >
           <span className="min-w-0 flex-1">
             <span className="t-search-label block pb-0.5">When</span>
@@ -660,13 +671,17 @@ export function ExpandedSearch() {
             </span>
           </span>
           {active("when") && search.whenFilled ? <ClearButton label="Clear dates" onClick={() => clearSegment("when")} /> : null}
-        </button>
+        </div>
         <span className={`search-divider ${dividerHidden("when", thirdSegment) ? "opacity-0" : ""}`} />
-        <button
-          type="button"
+        <div
+          role="button"
+          tabIndex={0}
           onMouseEnter={() => setHover(thirdSegment)}
           onClick={() => open(thirdSegment)}
-          className={`search-seg search-seg-who relative z-10 flex min-w-0 items-center overflow-hidden rounded-[var(--r-search-segment)] pl-6 pr-[var(--search-who-pr)] text-left ${active(thirdSegment) ? "bg-white shadow-pill" : "hover:bg-divider"}`}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") open(thirdSegment);
+          }}
+          className={`search-seg search-seg-who relative z-10 flex min-w-0 cursor-pointer items-center overflow-hidden rounded-[var(--r-search-segment)] pl-6 pr-[var(--search-who-pr)] text-left ${active(thirdSegment) ? "bg-white shadow-pill" : "hover:bg-divider"}`}
         >
           <span className="min-w-0 flex-1">
             <span className="t-search-label block pb-0.5">{searchProduct === "services" ? "Type of service" : "Who"}</span>
@@ -690,7 +705,7 @@ export function ExpandedSearch() {
               onClick={() => clearSegment(thirdSegment)}
             />
           ) : null}
-        </button>
+        </div>
         <button
           type="button"
           aria-label={segment ? undefined : "Search"}

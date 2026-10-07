@@ -191,6 +191,64 @@ erDiagram
         int listing_id PK
         datetime created_at
     }
+
+    users ||--o{ experiences : hosts
+    experiences ||--o{ experience_images : has
+    experiences ||--o{ experience_itinerary_items : has
+    experiences ||--o{ experience_slots : has
+    experience_slots ||--o{ experience_bookings : receives
+    users ||--o{ experience_bookings : books
+    experience_bookings ||--o| experience_reviews : "one per booking"
+    experiences ||--o{ experience_reviews : receives
+
+    experiences {
+        int id PK
+        int host_id FK
+        string title
+        string city
+        string region
+        string category
+        string description
+        int duration_minutes
+        int max_guests_per_slot
+        int price_per_guest
+        int private_price
+        int cancellation_hours
+        float avg_rating
+        int review_count
+        boolean is_active
+    }
+
+    experience_slots {
+        int id PK
+        int experience_id FK
+        datetime start_at
+        datetime end_at
+        int capacity
+        int booked_count
+        boolean is_cancelled
+    }
+
+    experience_bookings {
+        int id PK
+        int slot_id FK
+        int guest_id FK
+        int adults
+        string status
+        int price_per_guest_snapshot
+        int total_snapshot
+        string confirmation_code UK
+        datetime created_at
+    }
+
+    experience_reviews {
+        int id PK
+        int booking_id UK
+        int experience_id FK
+        int author_id FK
+        int rating
+        string comment
+    }
 ```
 
 Pricing for quotes and bookings is computed only in `pricing_service.quote_price` (weekend rates, single best listing discount, coupon, service fee, GST). Taxes are 5% of the nightly total after the listing discount and coupon, plus the cleaning fee, rounded half-up. The service fee stays 14% of the nightly total after the listing discount plus the cleaning fee, and a coupon does not change it. Pending and confirmed bookings block dates. A pending request expires 24 hours after `created_at`. Card numbers are not stored. `bathrooms` on a listing is the sum of the three bathroom columns, maintained on host create/update.

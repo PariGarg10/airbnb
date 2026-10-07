@@ -100,14 +100,14 @@ export function ListingReviewsSection({
 
   if (reviewCount === 0) {
     return (
-      <section id="reviews">
+      <section id="reviews" className="scroll-mt-[var(--listing-nav-h)]">
         <h2 className="t-heading">No reviews yet</h2>
       </section>
     );
   }
 
   return (
-    <section id="reviews">
+    <section id="reviews" className="scroll-mt-[var(--listing-nav-h)]">
       <h2 className="t-heading min-[1128px]:hidden">
         ★ {formatRating(avgRating)} · {reviewCount} reviews
       </h2>

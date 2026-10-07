@@ -140,7 +140,8 @@ Airbnb/
 Typical setup: **frontend on Vercel**, **API on Railway** (or similar).
 
 - Backend start: `uvicorn app.main:app --host 0.0.0.0 --port $PORT` (see `backend/railway.json`).
-- Set `NEXT_PUBLIC_API_URL` to the public API URL.
+- Set `NEXT_PUBLIC_API_URL` to the public API URL (required — without it the browser calls `localhost:8000` and home/catalog rows stay empty).
+- After pulling changes that touch seed data, run `python -m app.seed --reset` on the backend so **Experiences** and **Services** listings exist (same booking flow as stays).
 - Set `FRONTEND_URL` (and preview URLs in `ALLOWED_ORIGINS` if needed).
 - Use a persistent volume for `DATA_DIR` in production so SQLite and uploads survive redeploys.
 
