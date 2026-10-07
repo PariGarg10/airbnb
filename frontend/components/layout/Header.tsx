@@ -253,7 +253,7 @@ function HeaderBody() {
             <Logo wordmarkClassName="t-wordmark hidden min-[900px]:inline" />
           </Link>
 
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-30 hidden h-[var(--header-h)] md:block">
+          <div className="pointer-events-none absolute inset-x-0 top-0 hidden h-[var(--header-h)] md:block">
             <div className={`header-tabs-layer absolute inset-0 flex items-center justify-center ${expanded ? "" : "is-collapsed"}`}>
               <div className={expanded ? "pointer-events-auto" : "pointer-events-none"}>
                 <ProductTabs active={activeTab} onHome={setHomeTab} />

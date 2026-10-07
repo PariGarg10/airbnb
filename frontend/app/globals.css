@@ -1061,6 +1061,7 @@ body {
 }
 .header-pill-layer.is-expanded {
   transform: translateY(var(--stack-shift));
+  opacity: 0;
 }
 
 .compact-pill-surface,
