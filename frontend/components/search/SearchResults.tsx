@@ -7,7 +7,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { SwitchUserModal } from "@/components/auth/SwitchUserModal";
 import { ListingGrid } from "@/components/listings/ListingGrid";
 import { FilterChips } from "@/components/search/FilterChips";
-import { FiltersModal } from "@/components/search/FiltersModal";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { listingsApi } from "@/lib/api";
 import { formatResultsHeading } from "@/lib/format";
@@ -16,8 +15,13 @@ import { useSearchFilters } from "@/hooks/useSearchFilters";
 
 const ListingsMap = dynamic(() => import("@/components/listings/ListingsMap"), {
   ssr: false,
-  loading: () => <div className="search-map skeleton h-full w-full" />,
+  loading: () => <div className="search-map h-full w-full bg-[#ebebeb]" aria-hidden />,
 });
+
+const FiltersModal = dynamic(
+  () => import("@/components/search/FiltersModal").then((mod) => ({ default: mod.FiltersModal })),
+  { ssr: false },
+);
 
 export function ResultsLoadingSkeleton({ mapHidden }: { mapHidden?: boolean }) {
   return (

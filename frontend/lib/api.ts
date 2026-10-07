@@ -92,23 +92,34 @@ function toQuery(params: object): string {
   return text ? `?${text}` : "";
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+type CacheMode = "public" | "private";
+
+type ApiRequestInit = RequestInit & { cacheMode?: CacheMode };
+
+async function request<T>(path: string, init?: ApiRequestInit): Promise<T> {
+  const { cacheMode = "private", ...rest } = init ?? {};
   const headers = authHeaders();
-  if (init?.headers) {
-    new Headers(init.headers).forEach((value, key) => headers.set(key, value));
+  if (rest.headers) {
+    new Headers(rest.headers).forEach((value, key) => headers.set(key, value));
   }
-  const isForm = typeof FormData !== "undefined" && init?.body instanceof FormData;
-  if (init?.body && !isForm && !headers.has("Content-Type")) {
+  const isForm = typeof FormData !== "undefined" && rest.body instanceof FormData;
+  if (rest.body && !isForm && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
+  }
+
+  const fetchInit: RequestInit = { ...rest, headers };
+  const personalized = headers.has("X-User-Id");
+  if (cacheMode === "public" && !personalized) {
+    if (typeof window === "undefined") {
+      fetchInit.next = { revalidate: 60 };
+    }
+  } else {
+    fetchInit.cache = rest.cache ?? "no-store";
   }
 
   let response: Response;
   try {
-    response = await fetch(`${apiBase()}${path}`, {
-      ...init,
-      cache: init?.cache ?? "no-store",
-      headers,
-    });
+    response = await fetch(`${apiBase()}${path}`, fetchInit);
   } catch {
     throw new ApiError(0, "Network error");
   }
@@ -132,7 +143,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const usersApi = {
-  list: () => request<User[]>("/api/users"),
+  list: () => request<User[]>("/api/users", { cacheMode: "public" }),
   me: () => request<User>("/api/users/me"),
 };
 
@@ -145,14 +156,16 @@ export const listingsApi = {
         property_types: property_types?.join(","),
         amenities: amenities?.join(","),
       })}`,
+      { cacheMode: "public" },
     );
   },
-  get: (listingId: number) => request<ListingDetail>(`/api/listings/${listingId}`),
-  bookedDates: (listingId: number) => request<BookedRange[]>(`/api/listings/${listingId}/booked-dates`),
+  get: (listingId: number) => request<ListingDetail>(`/api/listings/${listingId}`, { cacheMode: "public" }),
+  bookedDates: (listingId: number) =>
+    request<BookedRange[]>(`/api/listings/${listingId}/booked-dates`, { cacheMode: "public" }),
   quote: (listingId: number, params: QuoteParams) =>
     request<Quote>(`/api/listings/${listingId}/quote${toQuery(params)}`),
-  amenities: () => request<Amenity[]>("/api/amenities"),
-  categories: () => request<CategoryCount[]>("/api/categories"),
+  amenities: () => request<Amenity[]>("/api/amenities", { cacheMode: "public" }),
+  categories: () => request<CategoryCount[]>("/api/categories", { cacheMode: "public" }),
 };
 
 export const couponsApi = {
@@ -227,7 +240,9 @@ export const wishlistApi = {
 
 export const reviewsApi = {
   list: (listingId: number, page = 1, pageSize = 6) =>
-    request<ReviewPage>(`/api/listings/${listingId}/reviews${toQuery({ page, page_size: pageSize })}`),
+    request<ReviewPage>(`/api/listings/${listingId}/reviews${toQuery({ page, page_size: pageSize })}`, {
+      cacheMode: "public",
+    }),
   create: (bookingId: number, body: ReviewCreate) =>
     request<Review>(`/api/bookings/${bookingId}/review`, {
       method: "POST",

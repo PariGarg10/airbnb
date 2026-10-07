@@ -9,6 +9,7 @@ import { createPortal } from "react-dom";
 import { AttributionControl, MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { MapClientGate } from "@/components/map/MapClientGate";
 import { MapResize } from "@/components/map/MapResize";
+import { listingPhotoUrl } from "@/lib/listingPhotoUrl";
 import { TILE_LAYER } from "@/lib/map";
 import { useAuth } from "@/lib/auth";
 import { formatInr, formatRating, formatResultsStayRange, propertyLabel } from "@/lib/format";
@@ -183,7 +184,9 @@ function PinCard({
     >
       <div className="dropdown-pop overflow-hidden rounded-[var(--card-radius)] bg-white shadow-popover">
         <div className="relative aspect-[20/19] bg-[var(--image-placeholder)]">
-          {photo ? <Image src={photo} alt="" fill className="object-cover" sizes="327px" /> : null}
+          {photo ? (
+            <Image src={listingPhotoUrl(photo)} alt="" fill className="object-cover" sizes="327px" loading="lazy" />
+          ) : null}
           <a href={href} target="_blank" rel="noreferrer" className="absolute inset-0" aria-label={listing.title} />
           {images.length > 1 ? (
             <>

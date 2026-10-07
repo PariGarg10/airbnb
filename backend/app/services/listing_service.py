@@ -415,6 +415,7 @@ def _to_card(
     check_out: date | None = None,
 ) -> ListingCard:
     images = sorted(listing.images, key=lambda image: image.position)
+    cover = images[0].url if images else None
     nights = None
     stay_total = None
     stay_original_total = None
@@ -439,7 +440,7 @@ def _to_card(
         price_per_night=listing.price_per_night,
         avg_rating=listing.avg_rating,
         review_count=listing.review_count,
-        images=[image.url for image in images[:5]],
+        images=[cover] if cover else [],
         lat=listing.lat,
         lng=listing.lng,
         host_is_superhost=listing.host.is_superhost,

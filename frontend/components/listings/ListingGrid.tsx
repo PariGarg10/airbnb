@@ -90,7 +90,7 @@ export function ListingGrid({
 
   return (
     <div className={`${columns}${results && mapHidden ? " min-[1440px]:grid-cols-3" : ""}`}>
-      {listings.map((listing) => (
+      {listings.map((listing, index) => (
         <ListingCard
           key={listing.id}
           listing={listing}
@@ -98,6 +98,7 @@ export function ListingGrid({
           active={!results && (hoveredId === listing.id || selectedId === listing.id)}
           onHover={onHover}
           onNeedAuth={onNeedAuth}
+          priority={index < 6}
           variant={results ? "results" : "grid"}
           stayDates={
             results && filters.check_in && filters.check_out ? { checkIn: filters.check_in, checkOut: filters.check_out } : undefined

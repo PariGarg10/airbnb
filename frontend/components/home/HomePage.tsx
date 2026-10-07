@@ -2,6 +2,7 @@
 
 import { useQueries } from "@tanstack/react-query";
 import { ChevronRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { SwitchUserModal } from "@/components/auth/SwitchUserModal";
@@ -11,6 +12,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { listingsApi } from "@/lib/api";
 import { APP_NAME } from "@/lib/brand";
 import { DESTINATIONS } from "@/lib/destinations";
+import { listingPhotoUrl } from "@/lib/listingPhotoUrl";
 import type { ListingCard as ListingCardData, ListingSearchParams } from "@/types";
 
 const COVER_FALLBACKS: Record<string, string> = {
@@ -260,10 +262,13 @@ function CoverPhoto({ src, alt }: { src?: string; alt: string }) {
     return <img src="/icons/alt-destinations.png" alt="" className="h-full w-full object-contain p-2" />;
   }
   return (
-    <img
-      src={current}
+    <Image
+      src={listingPhotoUrl(current, 400)}
       alt=""
-      className="h-full w-full object-cover"
+      fill
+      className="object-cover"
+      sizes="124px"
+      loading="lazy"
       onError={() => {
         if (fallback && current !== fallback) setCurrent(fallback);
       }}
@@ -308,7 +313,7 @@ function DestinationRow({
           const cover = query.isError ? undefined : bestCover(query.data?.items ?? []);
           return (
             <Link key={city.id} href={searchHref({ location: city.query })} className="w-[clamp(92px,11vw,124px)] shrink-0 snap-start">
-              <span className="block aspect-square w-full overflow-hidden rounded-xl bg-soft">
+              <span className="relative block aspect-square w-full overflow-hidden rounded-xl bg-soft">
                 <CoverPhoto src={cover?.images[0] || COVER_FALLBACKS[city.title]} alt={city.title} />
               </span>
               <span className="t-destination-name mt-2 block truncate">{city.title}</span>

@@ -3,6 +3,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { addDays, differenceInCalendarDays, parseISO } from "date-fns";
 import { Award, Heart, Medal, Share } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -18,13 +19,10 @@ import { ListingReviewsSection } from "@/components/listing/ListingReviewsSectio
 import { ListingThingsToKnow } from "@/components/listing/ListingThingsToKnow";
 import { MoreStaysNearby } from "@/components/listing/MoreStaysNearby";
 import { ReserveCard } from "@/components/listing/ReserveCard";
-import { DateRangePicker, type DisabledRange } from "@/components/search/DateRangePicker";
+import type { DisabledRange } from "@/components/search/DateRangePicker";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { Divider } from "@/components/ui/Divider";
-import { ListingAboutModal } from "@/components/listing/modals/ListingAboutModal";
-import { ListingAmenitiesModal } from "@/components/listing/modals/ListingAmenitiesModal";
-import { ListingReviewsModal } from "@/components/listing/modals/ListingReviewsModal";
 import { useStayParams } from "@/hooks/useStayParams";
 import { useWishlist } from "@/hooks/useWishlist";
 import { amenityIcon } from "@/lib/amenityIcons";
@@ -36,6 +34,29 @@ import { bookHref } from "@/lib/bookUrl";
 import { formatInr, formatListingStaySubtitle, formatRating, formatStay, roomTypeLabel } from "@/lib/format";
 import { isGuestFavourite } from "@/lib/isGuestFavourite";
 import type { BookedRange, ListingDetail } from "@/types";
+
+const DateRangePicker = dynamic(
+  () => import("@/components/search/DateRangePicker").then((mod) => ({ default: mod.DateRangePicker })),
+  { ssr: false },
+);
+
+const ListingAboutModal = dynamic(
+  () => import("@/components/listing/modals/ListingAboutModal").then((mod) => ({ default: mod.ListingAboutModal })),
+  { ssr: false },
+);
+
+const ListingAmenitiesModal = dynamic(
+  () =>
+    import("@/components/listing/modals/ListingAmenitiesModal").then((mod) => ({
+      default: mod.ListingAmenitiesModal,
+    })),
+  { ssr: false },
+);
+
+const ListingReviewsModal = dynamic(
+  () => import("@/components/listing/modals/ListingReviewsModal").then((mod) => ({ default: mod.ListingReviewsModal })),
+  { ssr: false },
+);
 
 function hostingLabel(joinedYear: number): string {
   const years = Math.max(0, new Date().getFullYear() - joinedYear);

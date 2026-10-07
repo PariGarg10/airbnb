@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import { ListingPhotoLightbox } from "@/components/listing/modals/ListingPhotoLightbox";
 import { ListingPhotoTour } from "@/components/listing/modals/ListingPhotoTour";
+import { listingPhotoUrl } from "@/lib/listingPhotoUrl";
 import type { ListingImage } from "@/types";
 
 interface GalleryProps {
@@ -27,7 +28,7 @@ export function Gallery({ images, title, onShare, onSave, wishlisted }: GalleryP
   const [listOpen, setListOpen] = useState(false);
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [mobileIndex, setMobileIndex] = useState(0);
-  const photos = useMemo(() => images.map((image) => image.url), [images]);
+  const photos = useMemo(() => images.map((image) => listingPhotoUrl(image.url, 1200)), [images]);
 
   const openLightbox = (index: number) => setLightbox(index);
   const closeLightbox = () => setLightbox(null);
@@ -50,7 +51,15 @@ export function Gallery({ images, title, onShare, onSave, wishlisted }: GalleryP
         >
           {photos.map((url, index) => (
             <button key={`${url}-${index}`} type="button" className="relative aspect-[4/3] w-full shrink-0 snap-center bg-soft" onClick={() => openLightbox(index)}>
-              <Image src={url} alt="" fill className="object-cover" sizes="100vw" />
+              <Image
+                src={url}
+                alt=""
+                fill
+                className="object-cover"
+                sizes="100vw"
+                priority={index === 0}
+                loading={index === 0 ? undefined : "lazy"}
+              />
             </button>
           ))}
         </div>
@@ -75,6 +84,8 @@ export function Gallery({ images, title, onShare, onSave, wishlisted }: GalleryP
               fill
               className="object-cover transition duration-200 ease-standard hover:brightness-[0.85]"
               sizes={index === 0 ? "50vw" : "25vw"}
+              priority={index === 0}
+              loading={index === 0 ? undefined : "lazy"}
             />
           </button>
         ))}
@@ -102,7 +113,7 @@ export function Gallery({ images, title, onShare, onSave, wishlisted }: GalleryP
           <div className="mx-auto flex max-w-3xl flex-col gap-4 px-4 py-6">
             {photos.map((url, index) => (
               <button key={`${url}-list-${index}`} type="button" className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-soft" onClick={() => openLightbox(index)}>
-                <Image src={url} alt="" fill className="object-cover" sizes="768px" />
+                <Image src={url} alt="" fill className="object-cover" sizes="768px" loading="lazy" />
               </button>
             ))}
           </div>

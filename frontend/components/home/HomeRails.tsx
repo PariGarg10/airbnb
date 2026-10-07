@@ -1,11 +1,13 @@
 "use client";
 
 import { ChevronRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowButton, SeeAllTile, searchHref, useRowScroller } from "@/components/home/homeRowUi";
 import { ListingCard } from "@/components/listings/ListingCard";
 import { DESTINATIONS } from "@/lib/destinations";
+import { listingPhotoUrl } from "@/lib/listingPhotoUrl";
 import { isGuestFavourite } from "@/lib/isGuestFavourite";
 import type { ListingCard as ListingCardData } from "@/types";
 
@@ -42,10 +44,13 @@ function CoverPhoto({ src, alt }: { src?: string; alt: string }) {
     return <img src="/icons/alt-destinations.png" alt="" className="h-full w-full object-contain p-2" />;
   }
   return (
-    <img
-      src={current}
+    <Image
+      src={listingPhotoUrl(current, 400)}
       alt=""
-      className="h-full w-full object-cover"
+      fill
+      className="object-cover"
+      sizes="124px"
+      loading="lazy"
       onError={() => {
         if (fallback && current !== fallback) setCurrent(fallback);
       }}
@@ -75,7 +80,7 @@ function DestinationRow({ cities }: { cities: [string, ListingCardData[]][] }) {
           const cover = bestCover(list);
           return (
             <Link key={city} href={searchHref({ location: city })} className="w-[clamp(92px,11vw,124px)] shrink-0 snap-start">
-              <span className="block aspect-square w-full overflow-hidden rounded-xl bg-soft">
+              <span className="relative block aspect-square w-full overflow-hidden rounded-xl bg-soft">
                 <CoverPhoto src={cover?.images[0] || COVER_FALLBACKS[city]} alt={city} />
               </span>
               <span className="t-destination-name mt-2 block truncate">{city}</span>

@@ -5,7 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, select
+from starlette.middleware.gzip import GZipMiddleware
 from starlette.requests import Request
+
+from app.middleware.public_cache import PublicCacheMiddleware
 
 from app.core.config import ensure_directories, settings
 from app.core.exceptions import BadRequestError, ConflictError, ForbiddenError, NotFoundError
@@ -58,6 +61,8 @@ app.include_router(wishlist.router)
 app.include_router(uploads.router)
 app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
 
+app.add_middleware(PublicCacheMiddleware)
+app.add_middleware(GZipMiddleware, minimum_size=500)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,

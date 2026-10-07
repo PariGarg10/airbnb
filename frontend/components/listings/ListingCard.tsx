@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { formatInr, formatRating, formatResultsStayRange, propertyLabel } from "@/lib/format";
 import { useWishlist } from "@/hooks/useWishlist";
 import { isGuestFavourite } from "@/lib/isGuestFavourite";
+import { LISTING_CARD_SIZES, listingPhotoUrl } from "@/lib/listingPhotoUrl";
 import type { ListingCard as ListingCardData } from "@/types";
 
 interface ListingCardProps {
@@ -19,6 +20,7 @@ interface ListingCardProps {
   variant?: "grid" | "mini" | "row" | "results" | "rail";
   nights?: number;
   stayDates?: { checkIn: string; checkOut: string };
+  priority?: boolean;
 }
 
 export function ListingCard({
@@ -30,6 +32,7 @@ export function ListingCard({
   variant = "grid",
   nights,
   stayDates,
+  priority = false,
 }: ListingCardProps) {
   const { user } = useAuth();
   const { onHeart } = useWishlist();
@@ -107,7 +110,7 @@ export function ListingCard({
       >
         {photo ? (
           <Image
-            src={photo}
+            src={listingPhotoUrl(photo)}
             alt=""
             fill
             className="object-cover"
@@ -118,8 +121,10 @@ export function ListingCard({
                   ? "320px"
                   : variant === "mini"
                     ? "240px"
-                    : "(max-width: 640px) 100vw, 20vw"
+                    : LISTING_CARD_SIZES
             }
+            priority={priority}
+            loading={priority ? undefined : "lazy"}
           />
         ) : (
           <div className="h-full w-full bg-[var(--image-placeholder)]" />

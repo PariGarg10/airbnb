@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { listingsApi } from "@/lib/api";
 import { formatInr, formatRating } from "@/lib/format";
+import { listingPhotoUrl } from "@/lib/listingPhotoUrl";
 import type { ListingCard as ListingCardData } from "@/types";
 
 function useRowScroller(itemCount: number) {
@@ -52,7 +53,7 @@ function CompactCard({ listing }: { listing: ListingCardData }) {
     <Link href={`/listings/${listing.id}`} className="block w-[calc((100%-48px)/5)] min-w-[180px] shrink-0 snap-start">
       <div className="relative aspect-[20/19] overflow-hidden rounded-xl bg-placeholder">
         {photo ? (
-          <Image src={photo} alt="" fill sizes="200px" className="object-cover" />
+          <Image src={listingPhotoUrl(photo)} alt="" fill sizes="200px" className="object-cover" loading="lazy" />
         ) : (
           <div className="h-full w-full bg-placeholder" />
         )}

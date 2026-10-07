@@ -6,7 +6,7 @@ import { cityBlurb } from "@/lib/cityBlurbs";
 const ListingMap = dynamic(() => import("@/components/listing/ListingMap"), {
   ssr: false,
   loading: () => (
-    <div className="listing-map h-[420px] w-full skeleton rounded-2xl min-[1128px]:h-[480px] min-[1128px]:rounded-2xl" />
+    <div className="listing-map h-[420px] w-full rounded-2xl bg-[#ebebeb] min-[1128px]:h-[480px] min-[1128px]:rounded-2xl" aria-hidden />
   ),
 });
 

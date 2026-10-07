@@ -8,18 +8,24 @@ const nextConfig = {
       : ".next",
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "images.unsplash.com" },
-      { protocol: "https", hostname: "i.pravatar.cc" },
+      { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
+      { protocol: "https", hostname: "i.pravatar.cc", pathname: "/**" },
       {
         protocol: "http",
         hostname: "localhost",
         port: "8000",
-        pathname: "/uploads/**",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "127.0.0.1",
+        port: "8000",
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "**.up.railway.app",
-        pathname: "/uploads/**",
+        pathname: "/**",
       },
     ],
   },
