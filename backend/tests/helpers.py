@@ -84,21 +84,21 @@ def add_listing(db, host: User, **overrides) -> Listing:
 
         title=overrides.pop("title", "Beach house"),
 
-        description="A house by the water with room to sit outside.",
+        description=overrides.pop("description", "A house by the water with room to sit outside."),
 
-        property_type=PropertyType.house,
+        property_type=overrides.pop("property_type", PropertyType.house),
 
-        room_type=RoomType.entire_place,
+        room_type=overrides.pop("room_type", RoomType.entire_place),
 
-        category="Beachfront",
+        category=overrides.pop("category", "Beachfront"),
 
         city=overrides.pop("city", "Goa"),
 
-        country="India",
+        country=overrides.pop("country", "India"),
 
-        lat=15.5,
+        lat=overrides.pop("lat", 15.5),
 
-        lng=73.8,
+        lng=overrides.pop("lng", 73.8),
 
         price_per_night=overrides.pop("price_per_night", 5000),
 
@@ -106,9 +106,9 @@ def add_listing(db, host: User, **overrides) -> Listing:
 
         max_guests=overrides.pop("max_guests", 4),
 
-        bedrooms=2,
+        bedrooms=overrides.pop("bedrooms", 2),
 
-        beds=2,
+        beds=overrides.pop("beds", 2),
 
         bathrooms=private + dedicated + shared,
 

@@ -15,7 +15,8 @@ import { amenityIcon } from "@/lib/amenityIcons";
 import { propertyTypeIcons } from "@/lib/categoryIcons";
 
 import { GUEST_FAVOURITE_BLURB } from "@/lib/brand";
-import { formatInr, propertyLabel } from "@/lib/format";
+import { FilterPriceRange } from "@/components/search/FilterPriceRange";
+import { propertyLabel } from "@/lib/format";
 
 import {
   countActiveFilters,
@@ -24,22 +25,15 @@ import {
 
 import type { Amenity, PropertyType, RoomType } from "@/types";
 
-const PRICE_FLOOR = 0;
-
-const PRICE_CEILING = 100_000;
-
 const GROUP_ORDER = ["Essentials", "Features", "Location", "Safety"];
-
-const HISTOGRAM_BARS = 52;
 
 const DESKTOP_AMENITY_PREVIEW = 6;
 
-const RECOMMENDED_NAMES = [
-  "Washer",
-  "Free parking",
-  "Kitchen",
-  "Pool",
-] as const;
+const RECOMMENDED_NAMES = ["Washer", "Free parking", "Kitchen"] as const;
+
+const RECOMMENDED_LABELS: Record<string, string> = {
+  Washer: "Washing machine",
+};
 
 const SELF_CHECKIN_NAME = "Self check-in";
 
@@ -113,59 +107,6 @@ function FilterSection({
   );
 }
 
-function PriceHistogram({
-  prices,
-
-  minValue,
-
-  maxValue,
-}: {
-  prices: number[];
-
-  minValue: number;
-
-  maxValue: number;
-}) {
-  const buckets = useMemo(() => {
-    const counts = new Array(HISTOGRAM_BARS).fill(0);
-
-    prices.forEach((price) => {
-      const index = Math.min(
-        HISTOGRAM_BARS - 1,
-        Math.floor((price / PRICE_CEILING) * HISTOGRAM_BARS),
-      );
-
-      counts[index] += 1;
-    });
-
-    const peak = Math.max(...counts, 1);
-
-    return counts.map((count) => count / peak);
-  }, [prices]);
-
-  return (
-    <div className="mt-6 flex h-[72px] items-end gap-px" aria-hidden>
-      {buckets.map((height, index) => {
-        const start = (index / HISTOGRAM_BARS) * PRICE_CEILING;
-
-        const end = ((index + 1) / HISTOGRAM_BARS) * PRICE_CEILING;
-
-        const active = end >= minValue && start <= maxValue;
-
-        return (
-          <div
-            key={index}
-
-            className={`min-h-[3px] flex-1 rounded-t-[2px] ${active ? "bg-rausch" : "bg-[var(--border)]"}`}
-
-            style={{ height: `${Math.max(8, height * 100)}%` }}
-          />
-        );
-      })}
-    </div>
-  );
-}
-
 function AmenityPill({
   amenity,
   selected,
@@ -206,22 +147,33 @@ function RecommendedTile({
   onToggle: () => void;
 }) {
   const Icon = amenityIcon(amenity.icon);
+  const label = RECOMMENDED_LABELS[amenity.name] ?? amenity.name;
 
   return (
-    <button
-      type="button"
+    <button type="button" onClick={onToggle} className="flex flex-col items-center gap-2 text-center">
+      <span
+        className={`flex aspect-square w-full max-w-[148px] items-center justify-center rounded-xl border bg-white transition-[border-color] duration-200 ${
+          selected ? "border-2 border-ink" : "border border-hairline hover:border-ink"
+        }`}
+      >
+        <Icon size={40} strokeWidth={1.35} className="text-ink" />
+      </span>
+      <span className="text-xs leading-4 text-ink">{label}</span>
+    </button>
+  );
+}
 
-      onClick={onToggle}
-
-      className={`flex flex-col items-center gap-2 rounded-xl border p-3 text-center text-xs leading-4 text-ink transition-[border-color] duration-200 ${
-        selected
-          ? "border-2 border-ink"
-          : "border border-hairline hover:border-ink"
-      }`}
-    >
-      <Icon size={24} strokeWidth={1.5} />
-
-      <span>{amenity.name}</span>
+function InstantBookTile({ selected, onToggle }: { selected: boolean; onToggle: () => void }) {
+  return (
+    <button type="button" onClick={onToggle} className="flex flex-col items-center gap-2 text-center">
+      <span
+        className={`flex aspect-square w-full max-w-[148px] items-center justify-center rounded-xl border bg-white transition-[border-color] duration-200 ${
+          selected ? "border-2 border-ink" : "border border-hairline hover:border-ink"
+        }`}
+      >
+        <Zap size={40} strokeWidth={1.35} className="fill-[#fbbf24] text-[#f59e0b]" />
+      </span>
+      <span className="text-xs leading-4 text-ink">Instant Book</span>
     </button>
   );
 }
@@ -512,14 +464,6 @@ export function FiltersModal({
     ? grouped
     : grouped.slice(0, DESKTOP_AMENITY_PREVIEW);
 
-  const minValue = draft.min_price ?? PRICE_FLOOR;
-
-  const maxValue = draft.max_price ?? PRICE_CEILING;
-
-  const left = (minValue / PRICE_CEILING) * 100;
-
-  const right = 100 - (maxValue / PRICE_CEILING) * 100;
-
   const total = count.data?.total;
 
   const draftActive = countActiveFilters(draft) > 0;
@@ -598,28 +542,22 @@ export function FiltersModal({
   };
 
   const roomSegment = (options: typeof ROOM_OPTIONS) => (
-    <div className="mt-4 grid grid-cols-3 overflow-hidden rounded-xl border border-hairline">
+    <div className="mt-4 grid grid-cols-3 overflow-hidden rounded-xl border border-hairline bg-white">
       {options.map((option) => {
         const selected =
           option.value == null
             ? draft.room_type == null
             : option.value === "private_room"
-              ? draft.room_type === "private_room" ||
-                draft.room_type === "shared_room"
+              ? draft.room_type === "private_room" || draft.room_type === "shared_room"
               : draft.room_type === option.value;
 
         return (
           <button
             key={option.label}
-
             type="button"
-
             onClick={() => setDraft({ ...draft, room_type: option.value })}
-
-            className={`border-r border-hairline px-3 py-3 text-sm leading-[18px] last:border-r-0 ${
-              selected
-                ? "font-semibold text-ink ring-2 ring-inset ring-ink"
-                : "font-normal text-muted"
+            className={`border-r border-hairline px-3 py-3.5 text-sm leading-[18px] last:border-r-0 ${
+              selected ? "font-semibold text-ink ring-2 ring-inset ring-ink" : "font-normal text-ink"
             }`}
           >
             {option.label}
@@ -629,131 +567,13 @@ export function FiltersModal({
     </div>
   );
 
-  const priceBlock = (withHistogram: boolean) => (
-    <>
-      {withHistogram ? (
-        <PriceHistogram
-          prices={priceSamples.data ?? []}
-          minValue={minValue}
-          maxValue={maxValue}
-        />
-      ) : null}
-
-      <div className={`relative ${withHistogram ? "mt-4" : "mt-8"} h-8`}>
-        <div className="absolute top-1/2 h-0.5 w-full -translate-y-1/2 rounded-full bg-hairline" />
-
-        <div
-          className="absolute top-1/2 h-0.5 -translate-y-1/2 rounded-full bg-rausch"
-
-          style={{ left: `${left}%`, right: `${right}%` }}
-        />
-
-        <input
-          aria-label="Minimum price"
-
-          type="range"
-
-          min={PRICE_FLOOR}
-
-          max={PRICE_CEILING}
-
-          step={500}
-
-          value={minValue}
-
-          onChange={(event) => {
-            const next = Math.min(Number(event.target.value), maxValue);
-
-            setDraft({
-              ...draft,
-              min_price: next <= PRICE_FLOOR ? undefined : next,
-            });
-          }}
-
-          className="range-thumb"
-
-          style={{ zIndex: minValue > PRICE_CEILING - 1000 ? 5 : 3 }}
-        />
-
-        <input
-          aria-label="Maximum price"
-
-          type="range"
-
-          min={PRICE_FLOOR}
-
-          max={PRICE_CEILING}
-
-          step={500}
-
-          value={maxValue}
-
-          onChange={(event) => {
-            const next = Math.max(Number(event.target.value), minValue);
-
-            setDraft({
-              ...draft,
-              max_price: next >= PRICE_CEILING ? undefined : next,
-            });
-          }}
-
-          className="range-thumb"
-
-          style={{ zIndex: 4 }}
-        />
-      </div>
-
-      <div className="mt-4 grid grid-cols-2 gap-4">
-        <label className="text-xs leading-4 text-muted">
-          Minimum
-          <input
-            inputMode="numeric"
-
-            value={draft.min_price ?? ""}
-
-            placeholder={formatInr(PRICE_FLOOR)}
-
-            onChange={(event) => {
-              const next = Number(event.target.value);
-
-              setDraft({
-                ...draft,
-                min_price:
-                  event.target.value === "" || next <= 0 ? undefined : next,
-              });
-            }}
-
-            className="mt-1 w-full rounded-lg border border-hairline px-3 py-3 text-base leading-5 text-ink outline-none focus:border-ink"
-          />
-        </label>
-
-        <label className="text-right text-xs leading-4 text-muted">
-          Maximum
-          <input
-            inputMode="numeric"
-
-            value={draft.max_price ?? ""}
-
-            placeholder={`${formatInr(PRICE_CEILING)}+`}
-
-            onChange={(event) => {
-              const next = Number(event.target.value);
-
-              setDraft({
-                ...draft,
-
-                max_price:
-                  event.target.value === "" || next >= PRICE_CEILING
-                    ? undefined
-                    : next,
-              });
-            }}
-
-            className="mt-1 w-full rounded-lg border border-hairline px-3 py-3 text-right text-base leading-5 text-ink outline-none focus:border-ink"
-          />
-        </label>
-      </div>
-    </>
+  const priceBlock = () => (
+    <FilterPriceRange
+      prices={priceSamples.data ?? []}
+      minPrice={draft.min_price}
+      maxPrice={draft.max_price}
+      onChange={(patch) => setDraft({ ...draft, ...patch })}
+    />
   );
 
   const footer = (
@@ -797,42 +617,38 @@ export function FiltersModal({
       <section className="border-t border-hairline pt-8">
         <h3 className="text-lg font-semibold text-ink">Price range</h3>
 
-        <p className="mt-1 text-meta text-muted">Nightly price</p>
+        <p className="mt-1 text-meta text-muted">Trip price, includes all fees</p>
 
-        {priceBlock(false)}
+        {priceBlock()}
       </section>
 
       <section className="border-t border-hairline pt-8">
         <h3 className="text-lg font-semibold text-ink">Rooms and beds</h3>
-
-        <p className="mt-4 text-body font-medium text-ink">Bedrooms</p>
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          {(["any", 1, 2, 3, 4, 5, 6, 7, 8] as const).map((option) => {
-            const selected =
-              option === "any"
-                ? draft.min_bedrooms == null
-                : draft.min_bedrooms === option;
-
-            return (
-              <button
-                key={String(option)}
-
-                type="button"
-
-                onClick={() =>
-                  setDraft({
-                    ...draft,
-                    min_bedrooms: option === "any" ? undefined : option,
-                  })
-                }
-
-                className={`h-10 min-w-12 rounded-full border px-3 text-body ${selected ? "border-ink bg-ink text-white" : "border-hairline text-ink"}`}
-              >
-                {option === "any" ? "Any" : option === 8 ? "8+" : option}
-              </button>
-            );
-          })}
+        <div className="mt-2">
+          <CountRow
+            label="Bedrooms"
+            value={draft.min_bedrooms}
+            onChange={(min_bedrooms) => setDraft({ ...draft, min_bedrooms })}
+            decreaseLabel="Decrease bedrooms"
+            increaseLabel="Increase bedrooms"
+          />
+          <CountRow
+            label="Beds"
+            value={draft.min_beds}
+            onChange={(min_beds) => setDraft({ ...draft, min_beds })}
+            decreaseLabel="Decrease beds"
+            increaseLabel="Increase beds"
+          />
+          <CountRow
+            label="Bathrooms"
+            value={draft.min_bathrooms}
+            onChange={(min_bathrooms) => setDraft({ ...draft, min_bathrooms })}
+            min={1}
+            max={8}
+            step={0.5}
+            decreaseLabel="Decrease bathrooms"
+            increaseLabel="Increase bathrooms"
+          />
         </div>
       </section>
 
@@ -969,14 +785,15 @@ export function FiltersModal({
           {recommended.map((amenity) => (
             <RecommendedTile
               key={amenity.id}
-
               amenity={amenity}
-
               selected={draft.amenities?.includes(amenity.id) ?? false}
-
               onToggle={() => toggleAmenity(amenity.id)}
             />
           ))}
+          <InstantBookTile
+            selected={draft.instant_book === true}
+            onToggle={() => setDraft({ ...draft, instant_book: draft.instant_book ? undefined : true })}
+          />
         </div>
       </FilterSection>
 
@@ -988,7 +805,7 @@ export function FiltersModal({
         title="Price range"
         subtitle="Trip price, includes all fees"
       >
-        {priceBlock(true)}
+        {priceBlock()}
       </FilterSection>
 
       <FilterSection title="Rooms and beds">

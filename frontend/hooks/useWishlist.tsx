@@ -35,13 +35,14 @@ function removedLabel(names: string[]): string {
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const lists = useQuery({
+  useQuery({
     queryKey: ["wishlists", user?.id],
     queryFn: wishlistApi.list,
     enabled: Boolean(user),
   });
   const [mode, setMode] = useState<null | "save" | "create">(null);
   const [target, setTarget] = useState<SaveTarget | null>(null);
+  const [pickerLists, setPickerLists] = useState<WishlistSummary[]>([]);
   const [returnToSave, setReturnToSave] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,9 +53,13 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   }, [user]);
 
   const refresh = useCallback(
-    (listingId: number) => {
-      void queryClient.invalidateQueries({ queryKey: ["wishlists"] });
-      void queryClient.invalidateQueries({ queryKey: ["wishlist-items"] });
+    (listingId: number, wishlistId?: number) => {
+      void queryClient.refetchQueries({ queryKey: ["wishlists"] });
+      if (wishlistId != null) {
+        void queryClient.refetchQueries({ queryKey: ["wishlist-items", wishlistId] });
+      } else {
+        void queryClient.invalidateQueries({ queryKey: ["wishlist-items"] });
+      }
       void queryClient.invalidateQueries({ queryKey: ["listing", listingId] });
     },
     [queryClient],
@@ -75,12 +80,15 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
             setTarget({ ...listing, is_wishlisted: true });
             setReturnToSave(false);
             setError(null);
-            setMode("save");
+            void queryClient.fetchQuery({ queryKey: ["wishlists", user?.id], queryFn: wishlistApi.list }).then((data) => {
+              setPickerLists(data);
+              setMode("save");
+            });
           },
         },
       },
     );
-  }, []);
+  }, [queryClient, user?.id]);
 
   const loadLists = useCallback(async () => {
     if (!user) return [];
@@ -114,6 +122,32 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     [queryClient, refresh, user],
   );
 
+  const addToWishlist = useCallback(
+    async (wishlist: WishlistSummary, listing: SaveTarget) => {
+      if (!user || busy.current) return;
+      if (wishlist.listing_ids.includes(listing.id)) return;
+      busy.current = true;
+      const snapshots = captureWishlistCaches(queryClient);
+      applyListingSaved(queryClient, listing.id, true);
+      applyWishlistMembership(queryClient, user.id, listing.id, true, wishlist.id, listing.image);
+      setPending(true);
+      try {
+        await wishlistApi.addItem(wishlist.id, listing.id);
+        setMode(null);
+        showSaved(listing, wishlist.name);
+        refresh(listing.id, wishlist.id);
+      } catch (error) {
+        restoreWishlistCaches(queryClient, snapshots);
+        toast.error(error instanceof ApiError ? error.detail : "Could not save this place");
+        refresh(listing.id, wishlist.id);
+      } finally {
+        busy.current = false;
+        setPending(false);
+      }
+    },
+    [queryClient, refresh, showSaved, user],
+  );
+
   const onHeart = useCallback(
     (listing: SaveTarget) => {
       if (!user || busy.current) return;
@@ -124,7 +158,12 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
             await removeFromAll(listing, current);
             return;
           }
+          if (current.length === 1) {
+            await addToWishlist(current[0], listing);
+            return;
+          }
           setTarget(listing);
+          setPickerLists(current);
           setError(null);
           setReturnToSave(false);
           setMode(current.length === 0 ? "create" : "save");
@@ -133,44 +172,29 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         }
       })();
     },
-    [loadLists, removeFromAll, user],
+    [addToWishlist, loadLists, removeFromAll, user],
   );
 
   const close = useCallback(() => {
     if (pending) return;
     if (mode === "create" && returnToSave) {
-      setMode("save");
+      void loadLists().then((data) => {
+        setPickerLists(data);
+        setMode("save");
+      });
       setError(null);
       return;
     }
     setMode(null);
     setError(null);
-  }, [mode, pending, returnToSave]);
+  }, [loadLists, mode, pending, returnToSave]);
 
   const pick = useCallback(
     (wishlist: WishlistSummary) => {
-      if (!user || !target || busy.current) return;
-      busy.current = true;
-      const snapshots = captureWishlistCaches(queryClient);
-      applyListingSaved(queryClient, target.id, true);
-      applyWishlistMembership(queryClient, user.id, target.id, true, wishlist.id);
-      setPending(true);
-      void (async () => {
-        try {
-          await wishlistApi.addItem(wishlist.id, target.id);
-          setMode(null);
-          showSaved(target, wishlist.name);
-          refresh(target.id);
-        } catch (error) {
-          restoreWishlistCaches(queryClient, snapshots);
-          toast.error(error instanceof ApiError ? error.detail : "Could not save this place");
-        } finally {
-          busy.current = false;
-          setPending(false);
-        }
-      })();
+      if (!target) return;
+      void addToWishlist(wishlist, target);
     },
-    [queryClient, refresh, showSaved, target, user],
+    [addToWishlist, target],
   );
 
   const create = useCallback(
@@ -191,7 +215,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
           setMode(null);
           setReturnToSave(false);
           showSaved(target, created.name);
-          refresh(target.id);
+          refresh(target.id, created.id);
         } catch (error) {
           restoreWishlistCaches(queryClient, snapshots);
           setError(error instanceof ApiError ? error.detail : "Could not create wishlist");
@@ -209,7 +233,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       {children}
       {mode === "save" ? (
         <SaveWishlistModal
-          wishlists={lists.data ?? []}
+          wishlists={pickerLists}
           pending={pending}
           onClose={close}
           onPick={pick}

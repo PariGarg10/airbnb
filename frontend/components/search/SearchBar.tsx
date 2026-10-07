@@ -489,6 +489,7 @@ function WhenPanel() {
         <>
           <DateRangePicker
             layout="search"
+            monthCount={2}
             checkIn={draft.checkIn}
             checkOut={draft.checkOut}
             onChange={(checkIn, checkOut) => setDraft({ ...draft, checkIn, checkOut })}
@@ -733,7 +734,7 @@ export function CompactPill({ expanded = false }: { expanded?: boolean }) {
       <span aria-hidden className="compact-pill-surface" />
       <div className="compact-pill-row relative flex items-center">
         <button type="button" onClick={() => open("where")} className="compact-seg -m-px flex h-12 items-center rounded-[var(--r-compact-seg-l)] border border-transparent">
-          <PillHouse className="-my-px ml-2 h-12 w-12 shrink-0" />
+          <PillHouse className="ml-2 h-8 w-8 shrink-0" />
           <span className="t-compact-pill max-w-[168px] truncate pr-4">{compactWhere}</span>
         </button>
         <span className="h-6 w-px bg-hairline" />

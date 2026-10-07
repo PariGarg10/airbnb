@@ -7,19 +7,19 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, select
 from starlette.requests import Request
 
-from app.core.config import settings
+from app.core.config import ensure_directories, settings
 from app.core.exceptions import BadRequestError, ConflictError, ForbiddenError, NotFoundError
 from app.db import SessionLocal, init_db
 from app.models import User
 from app.routers import bookings, coupons, host, listings, uploads, users, wishlist
 from app.seed import run_seed
 
-settings.upload_dir.mkdir(parents=True, exist_ok=True)
+ensure_directories()
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    settings.upload_dir.mkdir(parents=True, exist_ok=True)
+    ensure_directories()
     init_db()
     db = SessionLocal()
     try:
@@ -56,17 +56,19 @@ app.include_router(coupons.router)
 app.include_router(host.router)
 app.include_router(wishlist.router)
 app.include_router(uploads.router)
-app.mount("/static/uploads", StaticFiles(directory=settings.upload_dir), name="uploads")
+app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["X-User-Id", "Content-Type", "Accept", "Authorization"],
 )
 
 
+@app.get("/health")
 @app.get("/api/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}

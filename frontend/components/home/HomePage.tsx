@@ -1,10 +1,11 @@
 "use client";
 
 import { useQueries } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SwitchUserModal } from "@/components/auth/SwitchUserModal";
+import { ArrowButton, SeeAllTile, searchHref, useRowScroller } from "@/components/home/homeRowUi";
 import { ListingCard } from "@/components/listings/ListingCard";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { listingsApi } from "@/lib/api";
@@ -13,91 +14,22 @@ import { DESTINATIONS } from "@/lib/destinations";
 import type { ListingCard as ListingCardData, ListingSearchParams } from "@/types";
 
 const COVER_FALLBACKS: Record<string, string> = {
-  Goa: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80",
-  Manali: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80",
-  Jaipur: "https://images.unsplash.com/photo-1567157577867-05ccb1388e66?w=600&q=80",
-  Udaipur: "https://images.unsplash.com/photo-1533154683836-84ea7a0bc310?w=600&q=80",
-  Rishikesh: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=600&q=80",
-  Coorg: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=600&q=80",
-  Munnar: "https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?w=600&q=80",
-  Mumbai: "https://images.unsplash.com/photo-1566552881560-0be862a7c445?w=600&q=80",
-  Bali: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=600&q=80",
-  Lisbon: "https://images.unsplash.com/photo-1513735492246-483525079686?w=600&q=80",
-  Tokyo: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&q=80",
-  Santorini: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=600&q=80",
+  Goa: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&q=60",
+  Manali: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=60",
+  Jaipur: "https://images.unsplash.com/photo-1567157577867-05ccb1388e66?w=400&q=60",
+  Udaipur: "https://images.unsplash.com/photo-1533154683836-84ea7a0bc310?w=400&q=60",
+  Rishikesh: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400&q=60",
+  Coorg: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=400&q=60",
+  Munnar: "https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?w=400&q=60",
+  Mumbai: "https://images.unsplash.com/photo-1566552881560-0be862a7c445?w=400&q=60",
+  Bali: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=400&q=60",
+  Lisbon: "https://images.unsplash.com/photo-1513735492246-483525079686?w=400&q=60",
+  Tokyo: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&q=60",
+  Santorini: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=400&q=60",
 };
-
-function searchHref(params: ListingSearchParams) {
-  const search = new URLSearchParams();
-  Object.entries(params).forEach(([key, value]) => {
-    if (key === "page" || key === "page_size") return;
-    if (typeof value !== "string" && typeof value !== "number") return;
-    if (value === "") return;
-    search.set(key, String(value));
-  });
-  const text = search.toString();
-  return text ? `/s?${text}` : "/s";
-}
 
 function bestCover(items: ListingCardData[]) {
   return [...items].sort((a, b) => b.avg_rating - a.avg_rating || b.review_count - a.review_count)[0];
-}
-
-function useRowScroller(itemCount: number) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [edges, setEdges] = useState({ prev: false, next: false });
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const update = () => {
-      setEdges({
-        prev: el.scrollLeft > 4,
-        next: el.scrollLeft + el.clientWidth < el.scrollWidth - 4,
-      });
-    };
-    update();
-    el.addEventListener("scroll", update, { passive: true });
-    const observer = new ResizeObserver(update);
-    observer.observe(el);
-    return () => {
-      el.removeEventListener("scroll", update);
-      observer.disconnect();
-    };
-  }, [itemCount]);
-
-  const scrollPage = (direction: -1 | 1) => {
-    const el = ref.current;
-    if (!el) return;
-    el.scrollBy({ left: direction * el.clientWidth, behavior: "smooth" });
-  };
-
-  return { ref, edges, scrollPage };
-}
-
-function ArrowButton({
-  label,
-  direction,
-  disabled,
-  onClick,
-}: {
-  label: string;
-  direction: "left" | "right";
-  disabled: boolean;
-  onClick: () => void;
-}) {
-  const Icon = direction === "left" ? ChevronLeft : ChevronRight;
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      disabled={disabled}
-      onClick={onClick}
-      className="row-arrow flex h-7 w-7 items-center justify-center rounded-[50%] bg-quaternary text-ink enabled:hover:bg-quaternary-hover disabled:cursor-not-allowed disabled:text-disabled disabled:opacity-50"
-    >
-      <Icon size={16} />
-    </button>
-  );
 }
 
 function RowSkeleton() {
@@ -115,22 +47,6 @@ function RowSkeleton() {
         ))}
       </div>
     </section>
-  );
-}
-
-function SeeAllTile({ href, photos }: { href: string; photos: string[] }) {
-  const stack = (photos.length >= 3 ? photos : [...photos, ...photos, ...photos]).slice(0, 3);
-  return (
-    <Link href={href} className="see-all-tile">
-      <span className="see-all-fan" aria-hidden>
-        {stack.map((photo, index) => (
-          <span key={`${photo}-${index}`} className="see-all-card">
-            <img src={photo} alt="" className="h-full w-full object-cover" />
-          </span>
-        ))}
-      </span>
-      <span className="see-all-label">See all</span>
-    </Link>
   );
 }
 
@@ -181,7 +97,7 @@ function ListingRow({
 }
 
 function PromoArt({ src }: { src: string }) {
-  return <img src={src} alt="" className="h-24 w-24 shrink-0 object-contain" />;
+  return <img src={src} alt="" className="h-14 w-14 shrink-0 object-contain md:h-16 md:w-16" />;
 }
 
 const PROMOS = [
@@ -211,32 +127,62 @@ export function HomePage() {
       {
         id: "goa",
         title: "Guest favourite homes in Goa",
-        params: { location: "Goa", page_size: 12 } satisfies ListingSearchParams,
+        params: { location: "Goa", page_size: 18 } satisfies ListingSearchParams,
       },
       {
         id: "manali",
         title: "Popular homes in Manali",
-        params: { location: "Manali", page_size: 12 } satisfies ListingSearchParams,
+        params: { location: "Manali", page_size: 18 } satisfies ListingSearchParams,
       },
       {
         id: "jaipur",
         title: "Guest favourite homes in Jaipur",
-        params: { location: "Jaipur", page_size: 12 } satisfies ListingSearchParams,
+        params: { location: "Jaipur", page_size: 18 } satisfies ListingSearchParams,
       },
       {
         id: "udaipur",
         title: "Popular homes in Udaipur",
-        params: { location: "Udaipur", page_size: 12 } satisfies ListingSearchParams,
+        params: { location: "Udaipur", page_size: 18 } satisfies ListingSearchParams,
+      },
+      {
+        id: "rishikesh",
+        title: "Stays in Rishikesh",
+        params: { location: "Rishikesh", page_size: 18 } satisfies ListingSearchParams,
+      },
+      {
+        id: "coorg",
+        title: "Homes in Coorg",
+        params: { location: "Coorg", page_size: 18 } satisfies ListingSearchParams,
+      },
+      {
+        id: "munnar",
+        title: "Popular stays in Munnar",
+        params: { location: "Munnar", page_size: 18 } satisfies ListingSearchParams,
       },
       {
         id: "mumbai",
         title: "Popular homes in Mumbai",
-        params: { location: "Mumbai", page_size: 12 } satisfies ListingSearchParams,
+        params: { location: "Mumbai", page_size: 18 } satisfies ListingSearchParams,
       },
       {
         id: "bali",
         title: "Guest favourite homes in Bali",
-        params: { location: "Bali", page_size: 12 } satisfies ListingSearchParams,
+        params: { location: "Bali", page_size: 18 } satisfies ListingSearchParams,
+      },
+      {
+        id: "lisbon",
+        title: "Homes in Lisbon",
+        params: { location: "Lisbon", page_size: 18 } satisfies ListingSearchParams,
+      },
+      {
+        id: "tokyo",
+        title: "Stays in Tokyo",
+        params: { location: "Tokyo", page_size: 18 } satisfies ListingSearchParams,
+      },
+      {
+        id: "santorini",
+        title: "Guest favourites in Santorini",
+        params: { location: "Santorini", page_size: 18 } satisfies ListingSearchParams,
       },
     ],
     [],
@@ -275,7 +221,7 @@ export function HomePage() {
                 <span className="t-promo-title">{promo.title}</span>
                 {"subtitle" in promo && promo.subtitle ? <span className="t-promo-subtitle mt-0.5 block">{promo.subtitle}</span> : null}
               </span>
-              <span className="t-promo-button ml-auto inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-full bg-quaternary px-4 transition-colors duration-200 ease-standard group-hover:bg-quaternary-hover">
+              <span className="t-promo-button ml-auto inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-full bg-quaternary px-3 transition-colors duration-200 ease-standard group-hover:bg-quaternary-hover">
                 Browse homes
               </span>
             </Link>

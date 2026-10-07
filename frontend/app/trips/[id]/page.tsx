@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { TripDetailView } from "@/components/trips/TripDetailView";
+import { TripExperience } from "@/components/trips/TripExperience";
 
 interface TripPageProps {
   params: { id: string };
@@ -11,7 +11,7 @@ export default function TripPage({ params }: TripPageProps) {
   if (!Number.isInteger(id) || id < 1) notFound();
   return (
     <Suspense fallback={<div className="container-airbnb py-16 text-meta text-muted">Loading reservation</div>}>
-      <TripDetailView bookingId={id} />
+      <TripExperience bookingId={id} />
     </Suspense>
   );
 }

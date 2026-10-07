@@ -21,7 +21,7 @@ from app.schemas.booking import (
     PriceSnapshot,
 )
 from app.schemas.listing import CouponOut, DiscountOut
-from app.services.booking_expiry import expire_pending
+from app.services.booking_expiry import expire_stale_pending
 from app.services.coupon_service import claim_coupon, require_coupon
 from app.services.listing_pricing import confirmed_booking_count, quote_listing_stay
 from app.services.listing_service import has_date_conflict, validate_stay
@@ -57,7 +57,7 @@ def create_booking(db: Session, guest: User, body: BookingCreate) -> BookingDeta
             raise NotFoundError("Listing not found")
         _validate_party(listing, adults, body.children, body.infants, body.pets)
         validate_stay(listing, body.check_in, body.check_out, guests)
-        expire_pending(db, listing_id=listing.id, commit=False)
+        expire_stale_pending(db, listing_id=listing.id, commit=False)
         if has_date_conflict(db, listing.id, body.check_in, body.check_out):
             raise ConflictError("These dates are already booked")
         if coupon is not None:
@@ -103,7 +103,7 @@ def create_booking(db: Session, guest: User, body: BookingCreate) -> BookingDeta
 
 
 def list_my_bookings(db: Session, guest: User) -> MyBookings:
-    expire_pending(db, commit=True)
+    expire_stale_pending(db, commit=True)
     today = date.today()
     rows = list(
         db.scalars(
@@ -115,16 +115,16 @@ def list_my_bookings(db: Session, guest: User) -> MyBookings:
     past = [row for row in rows if row.status == BookingStatus.confirmed and row.check_out <= today]
     cancelled = [row for row in rows if row.status in _CLOSED_STATUSES]
     return MyBookings(
-        upcoming=[_summary(row) for row in sorted(upcoming, key=lambda row: (row.check_in, row.id))],
-        pending=[_summary(row) for row in sorted(pending, key=lambda row: (row.check_in, row.id))],
-        past=[_summary(row) for row in sorted(past, key=lambda row: (row.check_out, row.id), reverse=True)],
-        cancelled=[_summary(row) for row in sorted(cancelled, key=_closed_sort, reverse=True)],
+        upcoming=[_summary(row, guest) for row in sorted(upcoming, key=lambda row: (row.check_in, row.id))],
+        pending=[_summary(row, guest) for row in sorted(pending, key=lambda row: (row.check_in, row.id))],
+        past=[_summary(row, guest) for row in sorted(past, key=lambda row: (row.check_out, row.id), reverse=True)],
+        cancelled=[_summary(row, guest) for row in sorted(cancelled, key=_closed_sort, reverse=True)],
     )
 
 
 def get_booking(db: Session, booking_id: int, user: User) -> BookingDetail:
+    expire_stale_pending(db, commit=True)
     booking = _get_booking(db, booking_id)
-    expire_pending(db, listing_id=booking.listing_id, commit=True)
     db.refresh(booking)
     _require_participant(booking, user)
     return _detail(booking, user)
@@ -190,12 +190,12 @@ def _pending_for_host(db: Session, host: User, booking_id: int) -> Booking:
     booking = _get_booking(db, booking_id)
     if booking.listing.host_id != host.id:
         raise ForbiddenError("You do not own this listing")
-    expire_pending(db, listing_id=booking.listing_id, commit=True)
+    expire_stale_pending(db, commit=True)
     db.refresh(booking)
     if booking.status == BookingStatus.expired:
         raise BadRequestError("This request has expired")
     if booking.status != BookingStatus.pending:
-        raise BadRequestError("Only a pending request can be updated")
+        raise ConflictError("This request is no longer pending")
     return booking
 
 
@@ -203,7 +203,7 @@ def _load_for_guest_change(db: Session, user: User, booking_id: int) -> Booking:
     booking = _get_booking(db, booking_id)
     if booking.guest_id != user.id:
         raise ForbiddenError("Only the guest can cancel this booking")
-    expire_pending(db, listing_id=booking.listing_id, commit=True)
+    expire_stale_pending(db, commit=True)
     db.refresh(booking)
     return booking
 
@@ -365,7 +365,7 @@ def _listing_out(listing: Listing, *, exact_address: bool) -> BookingListingOut:
     )
 
 
-def _summary(booking: Booking) -> BookingSummary:
+def _summary(booking: Booking, user: User) -> BookingSummary:
     return BookingSummary(
         id=booking.id,
         listing_id=booking.listing_id,
@@ -390,6 +390,8 @@ def _summary(booking: Booking) -> BookingSummary:
         refund_amount=booking.refund_amount,
         status=booking.status,
         listing=_listing_out(booking.listing, exact_address=False),
+        created_at=booking.created_at,
+        can_review=_can_review(booking, user),
     )
 
 
@@ -436,7 +438,7 @@ def _price_snapshot(booking: Booking) -> PriceSnapshot:
 
 
 def _detail(booking: Booking, user: User) -> BookingDetail:
-    summary = _summary(booking)
+    summary = _summary(booking, user)
     exact = booking.status == BookingStatus.confirmed
     host = booking.listing.host
     payload = summary.model_dump()
@@ -454,7 +456,6 @@ def _detail(booking: Booking, user: User) -> BookingDetail:
         cancelled_at=booking.cancelled_at,
         cancelled_by=booking.cancelled_by,
         can_cancel=_can_cancel(booking, user),
-        can_review=_can_review(booking, user),
         check_in_time=CHECK_IN_LABEL,
         check_out_time=CHECK_OUT_LABEL,
         host=BookingHostOut(name=host.name, avatar=host.avatar_url, joined_year=host.created_at.year),

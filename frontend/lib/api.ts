@@ -2,7 +2,10 @@ import type {
   Amenity,
   BookedRange,
   BookingCreate,
+  BookingCompanion,
   BookingDetail,
+  CancellationPreview,
+  CancelReason,
   CategoryCount,
   HostBooking,
   HostBookingStatus,
@@ -19,6 +22,7 @@ import type {
   Paginated,
   Quote,
   QuoteParams,
+  CouponValidation,
   Review,
   ReviewCreate,
   ReviewPage,
@@ -44,10 +48,7 @@ export class ApiError extends Error {
 }
 
 function apiBase(): string {
-  const base = process.env.NEXT_PUBLIC_API_URL;
-  if (!base) {
-    throw new ApiError(0, "NEXT_PUBLIC_API_URL is not set");
-  }
+  const base = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
   return base.replace(/\/$/, "");
 }
 
@@ -154,13 +155,28 @@ export const listingsApi = {
   categories: () => request<CategoryCount[]>("/api/categories"),
 };
 
+export const couponsApi = {
+  validate: (params: { code: string; listing_id: number; check_in: string; check_out: string }) =>
+    request<CouponValidation>(`/api/coupons/validate${toQuery(params)}`),
+};
+
 export const bookingsApi = {
   create: (body: BookingCreate) =>
     request<BookingDetail>("/api/bookings", { method: "POST", body: JSON.stringify(body) }),
   mine: () => request<MyBookings>("/api/bookings/me"),
   get: (bookingId: number) => request<BookingDetail>(`/api/bookings/${bookingId}`),
-  cancel: (bookingId: number) =>
-    request<BookingDetail>(`/api/bookings/${bookingId}/cancel`, { method: "POST" }),
+  cancellationPreview: (bookingId: number) =>
+    request<CancellationPreview>(`/api/bookings/${bookingId}/cancellation-preview`),
+  cancel: (bookingId: number, reason: CancelReason) =>
+    request<BookingDetail>(`/api/bookings/${bookingId}/cancel`, {
+      method: "POST",
+      body: JSON.stringify({ reason }),
+    }),
+  addCompanions: (bookingId: number, companions: { name: string; email: string }[]) =>
+    request<BookingCompanion[]>(`/api/bookings/${bookingId}/companions`, {
+      method: "POST",
+      body: JSON.stringify({ companions }),
+    }),
 };
 
 export const hostApi = {
@@ -184,6 +200,10 @@ export const hostApi = {
     }),
   bookings: (status: HostBookingStatus) =>
     request<HostBooking[]>(`/api/host/bookings${toQuery({ status })}`),
+  acceptBooking: (bookingId: number) =>
+    request<BookingDetail>(`/api/host/bookings/${bookingId}/accept`, { method: "POST" }),
+  declineBooking: (bookingId: number) =>
+    request<BookingDetail>(`/api/host/bookings/${bookingId}/decline`, { method: "POST" }),
   stats: () => request<HostStats>("/api/host/stats"),
 };
 

@@ -16,9 +16,9 @@ export type OccupantType = "me" | "family" | "other_guests" | "flatmates";
 
 export type BookingMode = "instant" | "approve_first_5";
 
-export type BookingStatus = "confirmed" | "cancelled";
+export type BookingStatus = "pending" | "confirmed" | "declined" | "expired" | "cancelled";
 
-export type HostBookingStatus = "upcoming" | "current" | "completed" | "cancelled";
+export type HostBookingStatus = "upcoming" | "current" | "completed" | "cancelled" | "pending";
 
 export interface Paginated<T> {
   items: T[];
@@ -218,9 +218,17 @@ export interface NightlyBreakdown {
   weekend_subtotal: number;
 }
 
+export type { CheckoutQuote, CheckoutGuestParams, CouponValidation } from "@/types/booking";
+
 export interface QuoteDiscount {
   type: string;
   pct: number;
+  amount: number;
+  reason_text?: string;
+}
+
+export interface QuoteCoupon {
+  code: string;
   amount: number;
 }
 
@@ -228,24 +236,38 @@ export interface Quote {
   nights: number;
   nightly_rate: number;
   nightly_breakdown: NightlyBreakdown;
+  nights_total_original?: number;
   nights_total: number;
   discount: QuoteDiscount | null;
+  coupon?: QuoteCoupon | null;
   cleaning_fee: number;
   service_fee: number;
+  taxes?: number;
   total: number;
   original_total: number;
+  total_original?: number;
+  is_rare_find?: boolean;
 }
 
 export interface QuoteParams {
   check_in: string;
   check_out: string;
   guests: number;
+  coupon?: string;
 }
 
 export interface CategoryCount {
   category: string;
   listing_count: number;
 }
+
+export type CancelReason =
+  | "plans_changed"
+  | "found_another_place"
+  | "travel_restrictions"
+  | "host_asked"
+  | "personal_emergency"
+  | "other";
 
 export interface BookingListing {
   id: number;
@@ -254,6 +276,10 @@ export interface BookingListing {
   country: string;
   cover_image: string | null;
   host_name: string;
+  host_avatar?: string | null;
+  lat: number;
+  lng: number;
+  address?: string | null;
 }
 
 export interface Booking {
@@ -262,32 +288,98 @@ export interface Booking {
   check_in: string;
   check_out: string;
   num_guests: number;
+  adults?: number;
+  children?: number;
+  infants?: number;
+  pets?: number;
   nights: number;
   nightly_rate: number;
   cleaning_fee: number;
   service_fee: number;
+  taxes?: number;
   discount_type: string | null;
   discount_amount: number;
+  coupon_code?: string | null;
+  coupon_amount?: number;
   original_total: number;
   total_price: number;
+  refund_amount?: number | null;
   status: BookingStatus;
   listing: BookingListing;
+  created_at?: string | null;
+  can_review?: boolean;
+}
+
+export interface BookingCompanion {
+  id: number;
+  name: string;
+  email: string;
+}
+
+export interface BookingPriceSnapshot {
+  nights: number;
+  nightly_rate: number;
+  nights_total_original: number;
+  nights_total: number;
+  discount: { type: string; pct: number; amount: number; reason_text?: string } | null;
+  coupon: { code: string; amount: number } | null;
+  cleaning_fee: number;
+  service_fee: number;
+  taxes: number;
+  total: number;
+  total_original: number;
+}
+
+export interface BookingHost {
+  name: string;
+  avatar: string | null;
+  joined_year: number;
+}
+
+export interface CancellationPreview {
+  refund_amount: number;
+  non_refundable_amount: number;
+  lines: { label: string; amount: number }[];
+  policy_text: string;
 }
 
 export interface BookingDetail extends Booking {
   guest_id: number;
+  message_to_host?: string | null;
+  confirmation_code: string;
+  payment_method_type?: "card" | "upi" | "netbanking" | null;
+  card_brand?: string | null;
+  card_last4?: string | null;
+  paid_at?: string | null;
+  can_cancel: boolean;
   can_review: boolean;
+  check_in_time: string;
+  check_out_time: string;
+  host: BookingHost;
+  price: BookingPriceSnapshot;
+  cancellation_policy_text: string;
+  companions: BookingCompanion[];
 }
 
 export interface BookingCreate {
   listing_id: number;
   check_in: string;
   check_out: string;
-  num_guests: number;
+  num_guests?: number;
+  adults?: number;
+  children?: number;
+  infants?: number;
+  pets?: number;
+  message_to_host?: string;
+  coupon_code?: string;
+  payment_method_type?: "card" | "upi" | "netbanking";
+  card_brand?: string;
+  card_last4?: string;
 }
 
 export interface MyBookings {
   upcoming: Booking[];
+  pending: Booking[];
   past: Booking[];
   cancelled: Booking[];
 }
@@ -362,6 +454,8 @@ export interface HostBooking {
   guests: number;
   total_price: number;
   status: BookingStatus;
+  message_to_host?: string | null;
+  created_at?: string;
 }
 
 export interface HostStats {

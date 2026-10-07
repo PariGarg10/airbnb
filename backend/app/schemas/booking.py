@@ -122,6 +122,8 @@ class BookingSummary(BaseModel):
     refund_amount: int | None = None
     status: BookingStatus
     listing: BookingListingOut
+    created_at: datetime | None = None
+    can_review: bool = False
 
 
 class BookingDetail(BookingSummary):
@@ -136,7 +138,6 @@ class BookingDetail(BookingSummary):
     cancelled_at: datetime | None = None
     cancelled_by: CancelledBy | None = None
     can_cancel: bool
-    can_review: bool
     check_in_time: str
     check_out_time: str
     host: BookingHostOut

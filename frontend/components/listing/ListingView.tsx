@@ -32,6 +32,7 @@ import { listingsApi, reviewsApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { GUEST_FAVOURITE_BLURB } from "@/lib/brand";
 import { formatBathroomFacts, formatOccupantsNote } from "@/lib/listingFacts";
+import { bookHref } from "@/lib/bookUrl";
 import { formatInr, formatListingStaySubtitle, formatRating, formatStay, roomTypeLabel } from "@/lib/format";
 import { isGuestFavourite } from "@/lib/isGuestFavourite";
 import type { BookedRange, ListingDetail } from "@/types";
@@ -160,7 +161,7 @@ export function ListingView({ initialListing }: { initialListing: ListingDetail 
 
   const reserveHref =
     quote.data && checkIn && checkOut
-      ? `/book/${listing.id}?check_in=${checkIn}&check_out=${checkOut}&guests=${guestCount}`
+      ? bookHref(listing.id, checkIn, checkOut, { adults: guestCount, children: 0, infants: 0, pets: 0 })
       : "";
 
   const navPriceLine =

@@ -1,7 +1,7 @@
 import type { CatalogItem } from "@/lib/mock/experiences";
 
 const IMG = (id: string) =>
-  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=600&q=80`;
+  `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=400&q=60`;
 
 export const SERVICE_TYPES = [
   "Photography",
@@ -44,6 +44,17 @@ export const SERVICE_SECTIONS: { id: string; title: string; featured?: boolean; 
       { id: "s8", title: "French-Indian fusion chef", city: "Puducherry", price: 3200, rating: 4.91, image: IMG("1504674900247-0877df9cc836") },
       { id: "s9", title: "Ayurvedic spa treatment", city: "Puducherry", price: 2800, rating: 4.97, image: IMG("1540555700478-4be289fbecef") },
       { id: "s10", title: "Yoga & breathwork coaching", city: "Puducherry", price: 1600, rating: 4.89, image: IMG("1506126613408-07c3529c3750") },
+      { id: "s11", title: "Family portrait session in the city", city: "Puducherry", price: 1900, rating: 4.86, image: IMG("1524504388940-b1c1722653fc") },
+    ],
+  },
+  {
+    id: "goa",
+    title: "Services in Goa",
+    items: [
+      { id: "s12", title: "Sunset photography on the beach", city: "Goa", price: 2400, rating: 4.94, image: IMG("1502672260266-1c1ef2d93688"), popular: true },
+      { id: "s13", title: "Private chef: Goan seafood feast", city: "Goa", price: 3800, rating: 4.92, image: IMG("1556910103-1c02745aae4d") },
+      { id: "s14", title: "In-villa massage & wellness", city: "Goa", price: 2000, rating: 4.88, image: IMG("1544161515-4ab6ce687db5") },
+      { id: "s15", title: "Personal trainer — beach workouts", city: "Goa", price: 1400, rating: 4.85, image: IMG("1571019614242-2b5a68c1e8c2") },
     ],
   },
 ];

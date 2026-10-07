@@ -43,8 +43,8 @@ export function ExplorePage() {
     !filters.allows_pets;
 
   const listings = useInfiniteQuery({
-    queryKey: ["listings", filters, browsing ? 48 : 20],
-    queryFn: ({ pageParam }) => listingsApi.search({ ...filters, page: pageParam, page_size: browsing ? 48 : 20 }),
+    queryKey: ["listings", filters, browsing ? 50 : 24],
+    queryFn: ({ pageParam }) => listingsApi.search({ ...filters, page: pageParam, page_size: browsing ? 50 : 24 }),
     initialPageParam: 1,
     getNextPageParam: (last) => (last.has_more ? last.page + 1 : undefined),
   });
@@ -67,18 +67,35 @@ export function ExplorePage() {
     return () => observer.disconnect();
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
+  const browseShell = "container-home space-y-6 pb-12 md:space-y-10 md:pt-[54px]";
+
   return (
-    <div className="pb-24">
+    <div className={browsing ? "" : "pb-24"}>
       {browsing ? null : <CategoryBar />}
-      <div className="container-airbnb py-6">
+      <div className={browsing ? browseShell : "container-airbnb py-6"}>
         {browsing && listings.isLoading ? (
-          <div>
-            <Skeleton className="h-8 w-64" />
-            <div className="mt-4 flex gap-4 overflow-hidden">
-              {Array.from({ length: 8 }, (_, index) => (
-                <Skeleton key={index} className="h-44 w-[148px] shrink-0 rounded-2xl" />
-              ))}
-            </div>
+          <div className="space-y-6 md:space-y-10">
+            <section>
+              <Skeleton className="h-7 w-56" />
+              <div className="dest-row no-scrollbar mt-4 flex gap-3 overflow-hidden">
+                {Array.from({ length: 8 }, (_, index) => (
+                  <Skeleton key={index} className="aspect-square w-[clamp(92px,11vw,124px)] shrink-0 rounded-xl" />
+                ))}
+              </div>
+            </section>
+            <section>
+              <Skeleton className="h-6 w-72" />
+              <Skeleton className="mt-2 h-4 w-56" />
+              <div className="home-row no-scrollbar">
+                {Array.from({ length: 7 }, (_, index) => (
+                  <div key={index} className="home-row-card">
+                    <Skeleton className="aspect-[20/19] w-full rounded-[var(--card-radius)]" />
+                    <Skeleton className="mt-1.5 h-[19px] w-3/4" />
+                    <Skeleton className="mt-1 h-[18px] w-1/2" />
+                  </div>
+                ))}
+              </div>
+            </section>
           </div>
         ) : null}
         {browsing && !listings.isLoading && !listings.isError ? (
@@ -112,6 +129,7 @@ export function ExplorePage() {
             {mapOpen ? (
               <div className="sticky top-36 h-[calc(100vh-11rem)]">
                 <ListingsMap
+                  key="explore-map"
                   listings={items}
                   filters={filters}
                   boundsKey={JSON.stringify(filters)}

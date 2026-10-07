@@ -14,6 +14,7 @@ import { useStayParams } from "@/hooks/useStayParams";
 import { ApiError, listingsApi } from "@/lib/api";
 import { StayPriceBreakdown } from "@/components/pricing/StayPriceBreakdown";
 import { bookingModeLabel } from "@/lib/listingFacts";
+import { bookHref } from "@/lib/bookUrl";
 import { formatInr, formatListingStaySubtitle, formatReserveInputDate, formatShortDate } from "@/lib/format";
 import type { ListingDetail } from "@/types";
 
@@ -73,7 +74,15 @@ export function ReserveCard({ listing, disabledRanges, onDatesChange }: ReserveC
       ? quote.error.detail
       : null;
   const priced = quote.data;
-  const reserveHref = `/book/${listing.id}?check_in=${checkIn}&check_out=${checkOut}&guests=${guestCount}`;
+  const reserveHref =
+    checkIn && checkOut
+      ? bookHref(listing.id, checkIn, checkOut, {
+          adults: counts.adults,
+          children: counts.children,
+          infants: counts.infants,
+          pets: counts.pets,
+        })
+      : "";
 
   const openDates = (focus: "check-in" | "check-out") => {
     setGuestsOpen(false);

@@ -4,7 +4,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.core.exceptions import BadRequestError, ConflictError, ForbiddenError, NotFoundError
-from app.services.booking_expiry import expire_pending
+from app.services.booking_expiry import expire_stale_pending
 from app.models import Amenity, Booking, HostProfile, Listing, ListingImage, ListingOccupant, User
 from app.models.enums import BookingMode, BookingStatus
 from app.schemas.host import (
@@ -127,7 +127,7 @@ def set_status(db: Session, host: User, listing_id: int, is_active: bool) -> Hos
 
 
 def list_bookings(db: Session, host: User, status: HostBookingStatus) -> list[HostBookingOut]:
-    expire_pending(db, commit=True)
+    expire_stale_pending(db, commit=True)
     today = date.today()
     stmt = (
         select(Booking)
@@ -252,9 +252,9 @@ def _apply_fields(db: Session, listing: Listing, body: ListingCreate) -> None:
     listing.has_noise_monitor = body.has_noise_monitor
     listing.has_weapons = body.has_weapons
     listing.allows_pets = body.allows_pets
-    listing.amenities = _amenities(db, body.amenity_ids)
-    _replace_images(listing, body.images)
-    _replace_occupants(listing, body.occupants)
+    _replace_amenities(db, listing, body.amenity_ids)
+    _replace_images(db, listing, body.images)
+    _replace_occupants(db, listing, body.occupants)
 
 
 def _amenities(db: Session, amenity_ids: list[int]) -> list[Amenity]:
@@ -268,16 +268,24 @@ def _amenities(db: Session, amenity_ids: list[int]) -> list[Amenity]:
     return [by_id[amenity_id] for amenity_id in unique_ids]
 
 
-def _replace_images(listing: Listing, images: list) -> None:
+def _replace_amenities(db: Session, listing: Listing, amenity_ids: list[int]) -> None:
+    listing.amenities.clear()
+    db.flush()
+    listing.amenities.extend(_amenities(db, amenity_ids))
+
+
+def _replace_images(db: Session, listing: Listing, images: list) -> None:
     listing.images.clear()
+    db.flush()
     for position, image in enumerate(images):
         listing.images.append(
             ListingImage(url=str(image.url), caption=image.caption, position=position)
         )
 
 
-def _replace_occupants(listing: Listing, occupants: list) -> None:
+def _replace_occupants(db: Session, listing: Listing, occupants: list) -> None:
     listing.occupants.clear()
+    db.flush()
     for occupant_type in occupants:
         listing.occupants.append(ListingOccupant(occupant_type=occupant_type))
 

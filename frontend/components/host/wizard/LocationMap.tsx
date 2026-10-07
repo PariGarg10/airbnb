@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import { AttributionControl, MapContainer, TileLayer, useMap } from "react-leaflet";
 import { MapZoomControls } from "@/components/host/wizard/MapZoomControls";
+import { MapClientGate } from "@/components/map/MapClientGate";
+import { MapResize } from "@/components/map/MapResize";
+import { TILE_LAYER } from "@/lib/map";
 import "leaflet/dist/leaflet.css";
 
 function SyncCenter({ onMove }: { onMove: (lat: number, lng: number) => void }) {
@@ -52,20 +55,22 @@ export default function LocationMap({
   className?: string;
 }) {
   return (
-    <MapContainer
-      center={[lat, lng]}
-      zoom={15}
-      scrollWheelZoom={interactive}
-      dragging={interactive}
-      className={`h-[360px] w-full min-[1128px]:h-[480px] ${className}`}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {interactive && onMove ? <SyncCenter onMove={onMove} /> : null}
-      {!interactive ? <DisableInteraction /> : null}
-      {interactive ? <MapZoomControls /> : null}
-    </MapContainer>
+    <MapClientGate className={`host-map h-[360px] w-full min-[1128px]:h-[480px] ${className}`}>
+      <MapContainer
+        center={[lat, lng]}
+        zoom={15}
+        scrollWheelZoom={interactive}
+        dragging={interactive}
+        attributionControl={false}
+        className="h-full w-full"
+      >
+        <TileLayer {...TILE_LAYER} />
+        <AttributionControl prefix={false} position="bottomright" />
+        <MapResize />
+        {interactive && onMove ? <SyncCenter onMove={onMove} /> : null}
+        {!interactive ? <DisableInteraction /> : null}
+        {interactive ? <MapZoomControls /> : null}
+      </MapContainer>
+    </MapClientGate>
   );
 }

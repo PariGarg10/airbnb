@@ -52,7 +52,7 @@ function FloatingField({
     <label
       className={`block px-3 py-2 transition-colors ${
         error ? "bg-[#fef2f2]" : "bg-white"
-      } ${focused ? "ring-2 ring-inset ring-ink" : ""}`}
+      } ${focused ? "shadow-[inset_0_0_0_1px_#222222]" : ""}`}
     >
       <span className={`block text-xs leading-4 ${error ? "text-[#c13515]" : "text-muted"}`}>{label}</span>
       <input

@@ -6,7 +6,10 @@ import Image from "next/image";
 import { Heart } from "lucide-react";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
-import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import { AttributionControl, MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import { MapClientGate } from "@/components/map/MapClientGate";
+import { MapResize } from "@/components/map/MapResize";
+import { TILE_LAYER } from "@/lib/map";
 import { useAuth } from "@/lib/auth";
 import { formatInr, formatRating, formatResultsStayRange, propertyLabel } from "@/lib/format";
 import { useWishlist } from "@/hooks/useWishlist";
@@ -61,7 +64,10 @@ function FitBounds({ listings, boundsKey }: { listings: ListingCardData[]; bound
   useEffect(() => {
     const current = listingsRef.current;
     if (!boundsKey || current.length === 0) return;
-    const points = current.map((item) => [item.lat, item.lng] as [number, number]);
+    const points = current
+      .filter((item) => Number.isFinite(item.lat) && Number.isFinite(item.lng))
+      .map((item) => [item.lat, item.lng] as [number, number]);
+    if (points.length === 0) return;
     map.fitBounds(L.latLngBounds(points), { padding: [48, 48], maxZoom: 13 });
   }, [boundsKey, map]);
   return null;
@@ -260,20 +266,20 @@ export default function ListingsMap({
   const selected = listings.find((item) => item.id === selectedId) ?? null;
 
   return (
-    <div className="search-map h-full w-full overflow-hidden">
-      <MapContainer
-        center={[20.6, 78.9]}
-        zoom={5}
-        zoomControl={false}
-        className="h-full w-full"
-        scrollWheelZoom
-      >
-        <TileLayer
-          attribution="© OpenStreetMap contributors © CARTO"
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-          keepBuffer={4}
-        />
-        <FitBounds listings={listings} boundsKey={boundsKey} />
+    <div className="search-map h-full min-h-[280px] w-full overflow-hidden">
+      <MapClientGate className="search-map h-full min-h-[280px] w-full">
+        <MapContainer
+          center={[20.6, 78.9]}
+          zoom={5}
+          zoomControl={false}
+          attributionControl={false}
+          className="h-full w-full"
+          scrollWheelZoom
+        >
+          <TileLayer {...TILE_LAYER} keepBuffer={4} />
+          <AttributionControl prefix={false} position="bottomright" />
+          <MapResize />
+          <FitBounds listings={listings} boundsKey={boundsKey} />
         <MapClick onClear={() => onSelect(null)} />
         <MapChrome expanded={expanded} onExpand={onExpand} />
         {listings.map((listing) => {
@@ -298,7 +304,8 @@ export default function ListingsMap({
         {selected ? (
           <PinCard listing={selected} filters={filters} onClose={() => onSelect(null)} onNeedAuth={onNeedAuth} />
         ) : null}
-      </MapContainer>
+        </MapContainer>
+      </MapClientGate>
     </div>
   );
 }

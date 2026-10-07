@@ -106,6 +106,7 @@ Header row `--header-h`: 80px, 96px at >=1440. Expanded header `--header-expande
 - Split: list `--search-list-w` 58.333%, map `--search-map-w` 41.667%; gutters 48px (`min-[1128px]:px-12`) on the list, map `pr-6`.
 - Map: sticky from `--search-map-sticky-top` (`var(--header-h) + 1px`), height `calc(100vh - sticky - 24px)`; panel radius `--r-map-panel` (24px). CARTO tiles unchanged.
 - Filter row: chips 40px tall, 14/18/400 (`.t-chip`), 8px gap on desktop; selected chip fill `#222` / white label (`.t-chip-selected`); Filters button stays white with 1px `#222` border when active filters + 18px count badge.
+- Filters modal (≥1128): recommended tiles = square icon box (max ~148px, `rounded-xl`, 1px `--border`, 40px icon) + 12/16 label; type-of-place 3-col segmented control; price histogram active `--histogram-bar-active` (`--brand`), inactive `--histogram-bar-inactive` (`#ffdfe8`), 32px white slider thumbs (`.filter-range-thumb`); min/max inputs pill (`rounded-full`, centered 16/20).
 - Heading band: `.t-results-heading` 20/24/600; fee line `.t-results-fees` 14/18/400 muted + 16px brand tag icon; totals ≥1000 → “Over 1,000 homes…”.
 - Grid: two columns, gap `--search-results-grid-gap-x` 24 / `--search-results-grid-gap-y` 40; card image 20/19, radius 20, Guest favourite pill same as home rows (§6); Superhost pill when no Guest favourite.
 - Card text: title 15/19/500 + rating 14/18/400 `★ 4.95 (22)`; subtitles 15/19 muted; stay dates line when `check_in`/`check_out`; price line underlined (`.t-results-price-line`, strong amount + regular “for N nights”).
@@ -114,13 +115,31 @@ Header row `--header-h`: 80px, 96px at >=1440. Expanded header `--header-expande
 - Pin popup: 327px card, image 20/19, carousel dots + chevrons, heart + close, same text stack as grid card.
 - Loading: filter pill skeletons + 2-col card skeletons (title + rating bar) + map panel skeleton.
 
-## 9. Explained (accepted) differences
+## 9. Checkout (`/book`, desktop ≥1128)
+
+- Minimal header: logo only, 1px `--divider` bottom border, height 80px (96px at ≥1440).
+- Main grid: max width 1200px, columns 656px + 464px, gap 80px; sidebar `sticky` top 96px.
+- Surfaces: cards `rounded-3xl`, 1px `--border`, message card padding 32px; summary card padding 24px.
+- Back control: 48px circle `--bg-secondary`; primary CTA 56px height, `--r-8`, `--brand-gradient`.
+- Rare-find pill: `--bg-rare-find`, `rounded-2xl`; discount lines `--text-discount`.
+- Change pills: `--bg-quaternary`, `rounded-lg`; modals `--r-32`, overlay fade + panel pop (`--spring-standard`).
+
+## 10. Guest trips (desktop ≥1128)
+
+- `/trips`: two-pane layout — list ~58% width, map ~42% with `rounded-2xl` CARTO panel, sticky below header; empty state uses `text-page` (32/36/600) title and `text-section` (22/600) subhead, rausch gradient CTA.
+- `/trips/[id]?confirmed=1|requested=1`: two columns ~1fr + 400px, sticky summary card (`rounded-2xl`, 1px hairline).
+- `/trips/[id]`: left panel max 560px scroll; hero `rounded-2xl`; detail map sticky ~480px height.
+- `/trips/[id]/cancel`: max content 720px, step titles `text-page`; primary cancel CTA uses `--brand-gradient` / `search-fill`.
+- Map markers: empty-state city chips 28×28 white squares + 12px label; trip markers 12×12 white squares (active fill `--text`).
+- Receipt print: only `#trip-receipt-print` visible (`globals.css` `@media print`).
+
+## 11. Explained (accepted) differences
 
 - Content: Destinations / promo sections exist only on ours; city names, prices and ratings differ; our DB has 5 listings per city so a row never scrolls at 1440.
 - Font: label widths differ (Plus Jakarta Sans), so tab x positions accumulate a few px.
 - DOM structure: Airbnb splits the header over layers (row 96px + gradient layer), pads inner wrappers instead of buttons, uses an `<input>` for Where; computed `display`, `gap`, `cursor`, `aspect-ratio`, `object-fit` are not compared (positions/sizes of the children are).
 
-## 10. Responsive and scrolled state
+## 12. Responsive and scrolled state
 
 Breakpoint: Airbnb switches layouts at **744px**, so Tailwind `md` starts at 744 (`tailwind.config.ts`). Audited widths: 1440, 1128, 950, 375 (all rows match or are explained).
 

@@ -4,9 +4,9 @@ from pathlib import Path
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-from app.core.config import settings
+from app.core.config import ensure_directories, settings
 
-Path(settings.DATA_DIR).mkdir(parents=True, exist_ok=True)
+ensure_directories()
 
 engine = create_engine(
     settings.database_url,

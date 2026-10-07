@@ -13,6 +13,7 @@ import { WishlistDialog, WishlistNameModal } from "@/components/wishlists/Wishli
 import { WishlistLogin } from "@/components/wishlists/WishlistsView";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { ApiError, wishlistApi } from "@/lib/api";
+import { useMinWidth } from "@/hooks/useMinWidth";
 import { useAuth } from "@/lib/auth";
 import { applyListingSaved } from "@/lib/wishlistCache";
 import type { WishlistSummary } from "@/types";
@@ -37,6 +38,7 @@ export function WishlistDetailView({ wishlistId }: { wishlistId: number }) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [mapExpanded, setMapExpanded] = useState(false);
   const [mobileMap, setMobileMap] = useState(false);
+  const desktopMap = useMinWidth(1128);
 
   const lists = useQuery({
     queryKey: ["wishlists", user?.id],
@@ -70,6 +72,7 @@ export function WishlistDetailView({ wishlistId }: { wishlistId: number }) {
   const missing = cards.error instanceof ApiError && (cards.error.status === 404 || cards.error.status === 403);
   const items = cards.data ?? [];
   const showMap = mapExpanded || mobileMap;
+  const mountMap = items.length > 0 && (desktopMap || mobileMap || mapExpanded);
   const name = wishlist?.name ?? "Wishlist";
 
   const rename = async (nextName: string) => {
@@ -218,21 +221,26 @@ export function WishlistDetailView({ wishlistId }: { wishlistId: number }) {
               <div
                 className={`h-[calc(100vh-24px)] min-[1128px]:sticky min-[1128px]:top-[88px] min-[1128px]:h-[calc(100vh-112px)] min-[1128px]:pr-6 ${mapExpanded ? "min-[1128px]:px-6" : ""}`}
               >
-                <ListingsMap
-                  listings={items}
-                  filters={{}}
-                  boundsKey={items.map((item) => item.id).join(",")}
-                  hoveredId={hoveredId}
-                  selectedId={selectedId}
-                  expanded={mapExpanded || mobileMap}
-                  onHover={setHoveredId}
-                  onSelect={setSelectedId}
-                  onExpand={() => {
-                    if (window.matchMedia("(max-width: 1127px)").matches) setMobileMap(false);
-                    else setMapExpanded((open) => !open);
-                  }}
-                  onNeedAuth={() => setAuthOpen(true)}
-                />
+                {mountMap ? (
+                  <ListingsMap
+                    key={mobileMap ? "wishlist-map-mobile" : "wishlist-map-desktop"}
+                    listings={items}
+                    filters={{}}
+                    boundsKey={items.map((item) => item.id).join(",")}
+                    hoveredId={hoveredId}
+                    selectedId={selectedId}
+                    expanded={mapExpanded || mobileMap}
+                    onHover={setHoveredId}
+                    onSelect={setSelectedId}
+                    onExpand={() => {
+                      if (window.matchMedia("(max-width: 1127px)").matches) setMobileMap(false);
+                      else setMapExpanded((open) => !open);
+                    }}
+                    onNeedAuth={() => setAuthOpen(true)}
+                  />
+                ) : (
+                  <div className="search-map h-full w-full rounded-2xl bg-[#ebebeb]" />
+                )}
               </div>
             </div>
           ) : null}

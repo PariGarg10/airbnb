@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { HomePage } from "@/components/home/HomePage";
+import { HomeSwitch } from "@/components/home/HomeSwitch";
 import { Skeleton } from "@/components/ui/Skeleton";
 
 function HomeFallback() {
@@ -18,7 +18,7 @@ function HomeFallback() {
 export default function Page() {
   return (
     <Suspense fallback={<HomeFallback />}>
-      <HomePage />
+      <HomeSwitch />
     </Suspense>
   );
 }

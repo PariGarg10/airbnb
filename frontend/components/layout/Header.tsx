@@ -2,7 +2,7 @@
 
 import { CircleUser, Heart, Menu, Search, Tag } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { SwitchUserModal } from "@/components/auth/SwitchUserModal";
 import { Logo } from "@/components/layout/Logo";
@@ -17,7 +17,7 @@ import { APP_NAME } from "@/lib/brand";
 
 const TABS = [
   { id: "all", label: "All", href: "/", icon: GlobeMark },
-  { id: "homes", label: "Homes", href: "/", icon: HouseMark },
+  { id: "homes", label: "Homes", href: "/?view=homes", icon: HouseMark },
   { id: "experiences", label: "Experiences", href: "/experiences", icon: BalloonMark },
   { id: "services", label: "Services", href: "/services", icon: BellMark },
 ] as const;
@@ -35,6 +35,14 @@ const TAB_BOX: Record<(typeof TABS)[number]["id"], { padL: number; padR: number;
 };
 
 function ProductTabs({ active, onHome }: { active: string; onHome: (tab: "all" | "homes") => void }) {
+  const [popId, setPopId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPopId(active);
+    const timer = window.setTimeout(() => setPopId(null), 480);
+    return () => window.clearTimeout(timer);
+  }, [active]);
+
   return (
     <nav className="flex items-start gap-[var(--tab-gap)]" aria-label="Explore">
       {TABS.map((tab) => {
@@ -47,11 +55,12 @@ function ProductTabs({ active, onHome }: { active: string; onHome: (tab: "all" |
             href={tab.href}
             onClick={() => {
               if (tab.id === "all" || tab.id === "homes") onHome(tab.id);
+              setPopId(tab.id);
             }}
             className="group relative flex h-9 items-center text-ink"
             style={{ paddingLeft: box.padL, paddingRight: box.padR, marginLeft: box.marginL }}
           >
-            <span className="tab-icon block h-9 w-9 shrink-0">
+            <span className={`tab-icon block h-9 w-9 shrink-0 ${popId === tab.id ? "is-pop" : ""}`}>
               <Icon className="h-9 w-9" />
             </span>
             <span className={on ? "t-tab-active" : "t-tab"} style={{ marginLeft: box.labelGap }}>
@@ -161,10 +170,12 @@ function HeaderFallback() {
 
 function HeaderBody() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const homesView = pathname === "/" && searchParams.get("view") === "homes";
   const tall = pathname === "/" || pathname.startsWith("/experiences") || pathname.startsWith("/services");
   const { user, isHost, isLoading } = useAuth();
   const { expanded, scrolled, segment, open, close } = useHeaderState(tall);
-  const [homeTab, setHomeTab] = useState<"all" | "homes">("all");
+  const [homeTab, setHomeTab] = useState<"all" | "homes">(() => (homesView ? "homes" : "all"));
   const [menuOpen, setMenuOpen] = useState(false);
   const [switchOpen, setSwitchOpen] = useState(false);
   const [overlayTop, setOverlayTop] = useState(200);
@@ -173,7 +184,19 @@ function HeaderBody() {
   const closeSwitch = useCallback(() => setSwitchOpen(false), []);
 
   const gutter = tall ? "px-[var(--home-px)]" : "container-airbnb";
-  const activeTab = pathname.startsWith("/experiences") ? "experiences" : pathname.startsWith("/services") ? "services" : homeTab;
+  const activeTab = pathname.startsWith("/experiences")
+    ? "experiences"
+    : pathname.startsWith("/services")
+      ? "services"
+      : homesView
+        ? "homes"
+        : pathname === "/"
+          ? homeTab
+          : "all";
+
+  useEffect(() => {
+    setHomeTab(homesView ? "homes" : "all");
+  }, [homesView]);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -300,7 +323,7 @@ function HeaderBody() {
           {tall ? <MobileChips active={activeTab} onHome={setHomeTab} expanded={expanded} /> : null}
         </div>
 
-        {pathname === "/" && !segment ? (
+        {pathname === "/" && !homesView && !segment ? (
           <div className="pointer-events-none absolute left-1/2 top-full z-30 hidden -translate-x-1/2 translate-y-3 md:block">
             <div className="pointer-events-auto flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm font-medium text-ink shadow-pill xl:px-4 xl:py-2 xl:text-body">
               <Tag size={16} className="text-rausch" />

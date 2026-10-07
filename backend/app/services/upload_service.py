@@ -22,7 +22,7 @@ def save_upload(content: bytes, content_type: str | None, base_url: str) -> str:
     path = Path(settings.upload_dir) / filename
     path.write_bytes(content)
     root = base_url.rstrip("/")
-    return f"{root}/static/uploads/{filename}"
+    return f"{root}/uploads/{filename}"
 
 
 def _extension_for(content: bytes, content_type: str | None) -> str:

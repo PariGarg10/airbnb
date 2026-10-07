@@ -58,6 +58,7 @@ export function applyWishlistMembership(
   listingId: number,
   saved: boolean,
   wishlistId?: number,
+  coverImage?: string | null,
 ) {
   queryClient.setQueryData<WishlistSummary[]>(["wishlists", userId], (current) => {
     if (!current) return current;
@@ -65,7 +66,16 @@ export function applyWishlistMembership(
       const has = list.listing_ids.includes(listingId);
       if (saved) {
         if (list.id !== wishlistId || has) return list;
-        return { ...list, count: list.count + 1, listing_ids: [listingId, ...list.listing_ids] };
+        const cover_images =
+          coverImage && !list.cover_images.includes(coverImage)
+            ? [coverImage, ...list.cover_images].slice(0, 4)
+            : list.cover_images;
+        return {
+          ...list,
+          count: list.count + 1,
+          listing_ids: [listingId, ...list.listing_ids],
+          cover_images,
+        };
       }
       if (!has) return list;
       return {

@@ -33,6 +33,8 @@ const config: Config = {
         "inverse-hover": "var(--bg-inverse-hover)",
         peach: "#F7E7D7",
         "peach-ink": "#7A3E1D",
+        "rare-find": "var(--bg-rare-find)",
+        discount: "var(--text-discount)",
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],

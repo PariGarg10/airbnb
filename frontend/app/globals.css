@@ -18,6 +18,10 @@
   --error: #c13515;
   --error-hover: #a3150f;
   --success-bg: #e6f6e9;
+  --text-discount: #008a05;
+  --bg-rare-find: #fbeff8;
+  --histogram-bar-active: var(--brand);
+  --histogram-bar-inactive: #ffdfe8;
   --brand: #ff385c;
   --brand-tertiary: #da1249;
   --brand-gradient: linear-gradient(to right, #e61e4d 0%, #e31c5f 50%, #d70466 100%);
@@ -197,7 +201,7 @@ body {
   .t-promo-subtitle { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text-muted); }
   .t-destination-name { font-size: 14px; line-height: 18px; font-weight: 600; color: var(--text); }
   .t-destination-tag { font-size: 12px; line-height: 16px; font-weight: 400; color: var(--text-muted); }
-  .t-promo-title { font-size: 18px; line-height: 22px; font-weight: 500; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .t-promo-title { font-size: 15px; line-height: 18px; font-weight: 500; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .t-promo-button { font-size: 14px; line-height: 18px; font-weight: 500; color: var(--text); }
   .t-card-title { font-size: 15px; line-height: 19px; font-weight: 500; color: var(--text); }
   .t-meta { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text-muted); }
@@ -440,7 +444,8 @@ body {
   object-fit: cover;
 }
 
-.airbnb-calendar {
+/* react-day-picker sets `--rdp-accent-color: blue` on `.rdp-root`; override on the nested root. */
+.airbnb-calendar .rdp-root {
   --rdp-accent-color: var(--text);
   --rdp-accent-background-color: var(--bg-secondary);
   --rdp-today-color: var(--text);
@@ -486,8 +491,12 @@ body {
 }
 
 .airbnb-calendar .rdp-range_start .rdp-day_button,
-.airbnb-calendar .rdp-range_end .rdp-day_button {
+.airbnb-calendar .rdp-range_end .rdp-day_button,
+.airbnb-calendar .rdp-selected:not(.rdp-range_middle) .rdp-day_button {
   font-weight: 600;
+  background-color: var(--text);
+  color: #ffffff;
+  border-color: var(--text);
 }
 
 .airbnb-calendar .rdp-today:not(.rdp-outside):not(.rdp-range_start):not(.rdp-range_end) .rdp-day_button {
@@ -521,6 +530,10 @@ body {
   height: 32px;
   border-radius: 999px;
   color: var(--text);
+}
+
+.airbnb-calendar .rdp-chevron {
+  fill: var(--text);
 }
 
 .airbnb-calendar .rdp-button_previous:hover,
@@ -644,7 +657,8 @@ body {
 }
 
 .search-map .leaflet-container,
-.listing-map .leaflet-container {
+.listing-map .leaflet-container,
+.host-map .leaflet-container {
   background: #ebebeb;
   font-family: inherit;
   border-radius: inherit;
@@ -653,17 +667,34 @@ body {
   z-index: 0;
 }
 
-.listing-map .leaflet-tile-pane {
+.listing-map .leaflet-tile-pane,
+.host-map .leaflet-tile-pane {
   z-index: 1;
 }
 
-.search-map .leaflet-tile {
-  opacity: 0;
-  transition: opacity 200ms linear;
+.search-map .leaflet-tile,
+.listing-map .leaflet-tile,
+.host-map .leaflet-tile {
+  opacity: 1;
 }
 
-.search-map .leaflet-tile-loaded {
+.search-map .leaflet-tile-loaded,
+.listing-map .leaflet-tile-loaded,
+.host-map .leaflet-tile-loaded {
   opacity: 1;
+}
+
+.leaflet-container .leaflet-control-attribution {
+  margin: 0;
+  padding: 2px 6px;
+  font-size: 10px;
+  line-height: 1.3;
+  color: #717171;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.leaflet-container .leaflet-control-attribution a {
+  color: #717171;
 }
 
 .search-map .price-pin-icon {
@@ -710,6 +741,101 @@ body {
   border-radius: 999px;
   border: 1px solid #222222;
   background: #ffffff;
+}
+
+.filter-histogram-bar-active {
+  background-color: var(--histogram-bar-active);
+}
+
+.filter-histogram-bar-inactive {
+  background-color: var(--histogram-bar-inactive);
+}
+
+.filter-range-thumb {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+}
+
+.filter-range-thumb::-webkit-slider-thumb {
+  pointer-events: auto;
+  height: 32px;
+  width: 32px;
+  appearance: none;
+  cursor: grab;
+  border-radius: 999px;
+  border: none;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.trips-city-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transform: translate(-50%, -100%);
+  white-space: nowrap;
+}
+
+.trips-city-marker__box {
+  display: block;
+  height: 28px;
+  width: 28px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+
+.trips-city-marker__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.trips-trip-marker__dot {
+  display: block;
+  height: 12px;
+  width: 12px;
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--text);
+}
+
+.trips-trip-marker__dot.is-active {
+  background: var(--text);
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #trip-receipt-print,
+  #trip-receipt-print * {
+    visibility: visible;
+  }
+  #trip-receipt-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
+
+.filter-range-thumb::-moz-range-thumb {
+  pointer-events: auto;
+  height: 32px;
+  width: 32px;
+  cursor: grab;
+  border-radius: 999px;
+  border: none;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
 }
 
 @keyframes save-overlay-in {
@@ -1029,6 +1155,99 @@ a:hover > .tab-icon {
   background-color: var(--divider);
 }
 
+.inspiration-tab {
+  position: relative;
+}
+
+.inspiration-tab-active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--text);
+}
+
+.inspiration-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 24px;
+}
+
+@media (min-width: 550px) {
+  .inspiration-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 950px) {
+  .inspiration-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.currency-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (min-width: 550px) {
+  .currency-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 744px) {
+  .currency-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.legal-prose .legal-lead {
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--text);
+}
+
+.legal-h2 {
+  margin-top: 2rem;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 28px;
+  color: var(--text);
+}
+
+.legal-h3 {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+  color: var(--text);
+}
+
+.legal-list {
+  margin-top: 0.75rem;
+  list-style: none;
+  padding: 0;
+}
+
+.legal-list li {
+  margin-top: 0.5rem;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text);
+}
+
+.legal-callout {
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .card-heart {
   transition: transform 250ms var(--ease-standard);
 }
@@ -1062,16 +1281,16 @@ a:hover > .tab-icon {
 
 .promo-card {
   display: flex;
-  height: 116px;
+  height: 96px;
   min-width: 0;
   flex: 0 0 calc((100% - (var(--promo-n) - 1) * 12px) / var(--promo-n));
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   scroll-snap-align: start;
   border: var(--border-elevated);
   border-radius: var(--r-24);
   background: var(--bg);
-  padding: 0 24px;
+  padding: 0 16px;
   box-shadow: var(--shadow-secondary);
   transition: box-shadow 200ms var(--ease-standard), transform 100ms var(--ease-standard);
 }
@@ -1158,6 +1377,11 @@ a:hover > .tab-icon {
   line-height: 19px;
 }
 
+.see-all-tile:not(.see-all-play) .see-all-card {
+  opacity: 0;
+  animation: none;
+}
+
 .see-all-card {
   position: absolute;
   top: 14%;
@@ -1175,22 +1399,73 @@ a:hover > .tab-icon {
   animation-fill-mode: both;
 }
 
-.see-all-card:nth-child(1) {
+.see-all-play .see-all-card:nth-child(1) {
   z-index: 3;
-  animation-name: see-all-pop-front;
-  animation-delay: 0.05s;
+  animation-name: see-all-pop-front, see-all-sway-front;
+  animation-delay: 0.05s, 0.75s;
+  animation-duration: 0.55s, 2.8s;
+  animation-iteration-count: 1, infinite;
+  animation-timing-function: cubic-bezier(0.2, 0.85, 0.2, 1), ease-in-out;
 }
 
-.see-all-card:nth-child(2) {
+.see-all-play .see-all-card:nth-child(2) {
   z-index: 2;
-  animation-name: see-all-pop-mid;
-  animation-delay: 0.34s;
+  animation-name: see-all-pop-mid, see-all-sway-mid;
+  animation-delay: 0.34s, 0.95s;
+  animation-duration: 0.55s, 3.1s;
+  animation-iteration-count: 1, infinite;
+  animation-timing-function: cubic-bezier(0.2, 0.85, 0.2, 1), ease-in-out;
 }
 
-.see-all-card:nth-child(3) {
+.see-all-play .see-all-card:nth-child(3) {
   z-index: 1;
-  animation-name: see-all-pop-back;
-  animation-delay: 0.62s;
+  animation-name: see-all-pop-back, see-all-sway-back;
+  animation-delay: 0.62s, 1.1s;
+  animation-duration: 0.55s, 3.4s;
+  animation-iteration-count: 1, infinite;
+  animation-timing-function: cubic-bezier(0.2, 0.85, 0.2, 1), ease-in-out;
+}
+
+.see-all-tile:hover .see-all-card:nth-child(1) {
+  animation: see-all-pop-front 0.55s cubic-bezier(0.2, 0.85, 0.2, 1) both, see-all-sway-front 2.8s ease-in-out 0.55s infinite;
+}
+
+.see-all-tile:hover .see-all-card:nth-child(2) {
+  animation: see-all-pop-mid 0.55s cubic-bezier(0.2, 0.85, 0.2, 1) both, see-all-sway-mid 3.1s ease-in-out 0.55s infinite;
+}
+
+.see-all-tile:hover .see-all-card:nth-child(3) {
+  animation: see-all-pop-back 0.55s cubic-bezier(0.2, 0.85, 0.2, 1) both, see-all-sway-back 3.4s ease-in-out 0.55s infinite;
+}
+
+@keyframes see-all-sway-front {
+  0%,
+  100% {
+    transform: translate(0, 8px) rotate(-6deg) scale(1);
+  }
+  50% {
+    transform: translate(0, 4px) rotate(-8deg) scale(1.02);
+  }
+}
+
+@keyframes see-all-sway-mid {
+  0%,
+  100% {
+    transform: translate(-10px, -18px) rotate(8deg) scale(0.94);
+  }
+  50% {
+    transform: translate(-12px, -14px) rotate(10deg) scale(0.96);
+  }
+}
+
+@keyframes see-all-sway-back {
+  0%,
+  100% {
+    transform: translate(28px, -4px) rotate(14deg) scale(0.9);
+  }
+  50% {
+    transform: translate(26px, -8px) rotate(12deg) scale(0.92);
+  }
 }
 
 @keyframes see-all-pop-front {
@@ -1231,22 +1506,26 @@ a:hover > .tab-icon {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .see-all-card {
+  .see-all-play .see-all-card,
+  .see-all-tile:hover .see-all-card {
     animation: none;
     opacity: 1;
   }
 
-  .see-all-card:nth-child(1) {
+  .see-all-play .see-all-card:nth-child(1),
+  .see-all-tile:hover .see-all-card:nth-child(1) {
     z-index: 3;
     transform: translate(0, 8px) rotate(-6deg) scale(1);
   }
 
-  .see-all-card:nth-child(2) {
+  .see-all-play .see-all-card:nth-child(2),
+  .see-all-tile:hover .see-all-card:nth-child(2) {
     z-index: 2;
     transform: translate(-10px, -18px) rotate(8deg) scale(0.94);
   }
 
-  .see-all-card:nth-child(3) {
+  .see-all-play .see-all-card:nth-child(3),
+  .see-all-tile:hover .see-all-card:nth-child(3) {
     z-index: 1;
     transform: translate(28px, -4px) rotate(14deg) scale(0.9);
   }
@@ -1261,10 +1540,51 @@ a:hover > .tab-icon {
   margin-inline: auto;
 }
 
+.when-panel .airbnb-calendar .rdp-months {
+  flex-wrap: nowrap;
+  gap: 48px;
+}
+
+.when-panel .airbnb-calendar .rdp-today:not(.rdp-outside):not(.rdp-range_start):not(.rdp-range_end) .rdp-day_button {
+  border-color: #dddddd;
+  font-weight: 600;
+}
+
+@media (max-width: 743px) {
+  .when-panel .airbnb-calendar .rdp-months {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+.tab-icon img {
+  transition: transform 200ms var(--ease-standard);
+}
+
+.tab-icon.is-pop img {
+  animation: tab-icon-pop 0.48s var(--spring-fast);
+}
+
+@keyframes tab-icon-pop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.14);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 @media (min-width: 1128px) {
-  :where(a, button, [role="button"], input, select, textarea):focus-visible {
+  :where(a, button, [role="button"], select):focus-visible {
     outline: 2px solid var(--text);
     outline-offset: 2px;
+  }
+
+  :where(input, textarea):focus-visible {
+    outline: none;
   }
 }
 

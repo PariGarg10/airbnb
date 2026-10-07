@@ -1,7 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Lets `npm run build` run while `next dev` holds the default .next folder (set NEXT_DIST_DIR=.next-build).
-  distDir: process.env.NEXT_DIST_DIR || ".next",
+  // Production build only: NEXT_DIST_DIR=.next-build avoids clashing with a running dev server.
+  // Dev always uses `.next` so the browser never requests stale layout chunks.
+  distDir:
+    process.env.NEXT_DIST_DIR && process.env.npm_lifecycle_event === "build"
+      ? process.env.NEXT_DIST_DIR
+      : ".next",
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
@@ -10,17 +14,12 @@ const nextConfig = {
         protocol: "http",
         hostname: "localhost",
         port: "8000",
-        pathname: "/static/uploads/**",
-      },
-      {
-        protocol: "https",
-        hostname: "**.onrender.com",
-        pathname: "/static/uploads/**",
+        pathname: "/uploads/**",
       },
       {
         protocol: "https",
         hostname: "**.up.railway.app",
-        pathname: "/static/uploads/**",
+        pathname: "/uploads/**",
       },
     ],
   },

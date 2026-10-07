@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "dev:clean": "node -e \"try{require('fs').rmSync('.next',{recursive:true,force:true})}catch(e){}\" && next dev",
+    "build": "node scripts/build.mjs",
     "start": "next start",
     "lint": "next lint",
     "audit": "tsx scripts/visual-audit/run.ts"

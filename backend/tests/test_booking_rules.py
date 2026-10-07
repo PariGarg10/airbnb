@@ -262,7 +262,9 @@ def test_pending_expires_and_frees_dates(api):
     assert created.status_code == 201
     booking_id = created.json()["id"]
     row = db.get(Booking, booking_id)
-    row.created_at = datetime.now().astimezone() - timedelta(hours=25)
+    from app.core.time import utcnow
+
+    row.created_at = utcnow() - timedelta(hours=25)
     db.commit()
 
     detail = client.get(f"/api/bookings/{booking_id}", headers=_auth(guest.id))

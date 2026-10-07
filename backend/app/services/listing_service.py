@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from sqlalchemy import exists, func, or_, select
 from sqlalchemy.orm import Session, selectinload
@@ -7,7 +7,7 @@ from app.core.exceptions import BadRequestError, ConflictError, NotFoundError
 from app.models import Amenity, Booking, Listing, User, Wishlist, WishlistItem
 from app.models.amenity import listing_amenities
 from app.models.booking import BLOCKING_STATUSES, overlap_condition
-from app.models.enums import PropertyType, RoomType
+from app.models.enums import BookingStatus, PropertyType, RoomType
 from app.schemas.common import Paginated
 from app.schemas.listing import (
     AmenityOut,
@@ -22,7 +22,7 @@ from app.schemas.listing import (
     NightlyBreakdownOut,
     StayQuote,
 )
-from app.services.booking_expiry import expire_pending
+from app.services.booking_expiry import expire_stale_pending
 from app.services.coupon_service import require_coupon
 from app.services.listing_location import public_coordinates
 from app.services.listing_pricing import quote_listing_stay
@@ -74,7 +74,7 @@ class ListingSearch:
 
 def search_listings(db: Session, filters: ListingSearch, user: User | None) -> Paginated[ListingCard]:
     if filters.check_in is not None and filters.check_out is not None:
-        expire_pending(db, commit=True)
+        expire_stale_pending(db, commit=True)
     stmt = select(Listing).where(Listing.is_active.is_(True))
     stmt = _apply_filters(stmt, filters)
 
@@ -182,7 +182,7 @@ def listing_detail(db: Session, listing: Listing, user: User | None) -> ListingD
 
 def booked_dates(db: Session, listing_id: int) -> list[BookedRange]:
     _require_active(db, listing_id)
-    expire_pending(db, listing_id=listing_id, commit=True)
+    expire_stale_pending(db, listing_id=listing_id, commit=True)
     rows = db.scalars(
         select(Booking)
         .where(
@@ -225,7 +225,7 @@ def quote_stay(
 ) -> StayQuote:
     listing = _require_active(db, listing_id)
     validate_stay(listing, check_in, check_out, guests)
-    expire_pending(db, listing_id=listing.id, commit=True)
+    expire_stale_pending(db, listing_id=listing.id, commit=True)
     if has_date_conflict(db, listing.id, check_in, check_out):
         raise ConflictError("These dates are already booked")
     coupon_code, coupon_percent = _coupon_args(db, coupon)
@@ -237,7 +237,26 @@ def quote_stay(
         coupon_code=coupon_code,
         coupon_percent=coupon_percent,
     )
-    return _stay_quote(priced)
+    rare = _is_rare_find(db, listing.id, date.today())
+    return _stay_quote(priced, is_rare_find=rare)
+
+
+def _is_rare_find(db: Session, listing_id: int, today: date) -> bool:
+    window_end = today + timedelta(days=30)
+    count = int(
+        db.scalar(
+            select(func.count())
+            .select_from(Booking)
+            .where(
+                Booking.listing_id == listing_id,
+                Booking.status == BookingStatus.confirmed,
+                Booking.check_in >= today,
+                Booking.check_in < window_end,
+            )
+        )
+        or 0
+    )
+    return count >= 3
 
 
 def _coupon_args(db: Session, coupon: str | None) -> tuple[str | None, int | None]:
@@ -247,7 +266,7 @@ def _coupon_args(db: Session, coupon: str | None) -> tuple[str | None, int | Non
     return row.code, row.percent_off
 
 
-def _stay_quote(priced) -> StayQuote:
+def _stay_quote(priced, *, is_rare_find: bool = False) -> StayQuote:
     discount = None
     if priced.discount is not None:
         discount = DiscountOut(
@@ -280,6 +299,7 @@ def _stay_quote(priced) -> StayQuote:
         total=priced.total,
         original_total=priced.original_total,
         total_original=priced.original_total,
+        is_rare_find=is_rare_find,
     )
 
 

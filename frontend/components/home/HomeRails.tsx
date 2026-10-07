@@ -1,135 +1,181 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
-import { useRef } from "react";
+import { ChevronRight } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowButton, SeeAllTile, searchHref, useRowScroller } from "@/components/home/homeRowUi";
 import { ListingCard } from "@/components/listings/ListingCard";
-import { useSearchFilters } from "@/hooks/useSearchFilters";
+import { DESTINATIONS } from "@/lib/destinations";
 import { isGuestFavourite } from "@/lib/isGuestFavourite";
 import type { ListingCard as ListingCardData } from "@/types";
 
-const BLURBS: Record<string, string> = {
-  Goa: "Prime beach spot",
-  Manali: "Mountain retreat",
-  Jaipur: "Palaces and colour",
-  Udaipur: "Lakeside stays",
-  Rishikesh: "Riverside escape",
-  Coorg: "Coffee country",
-  Munnar: "Tea gardens",
-  Mumbai: "City energy",
-  Bali: "Island living",
-  Lisbon: "For a trip abroad",
-  Tokyo: "World-class dining",
-  Santorini: "Cliffside views",
+const COVER_FALLBACKS: Record<string, string> = {
+  Goa: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&q=60",
+  Manali: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=60",
+  Jaipur: "https://images.unsplash.com/photo-1567157577867-05ccb1388e66?w=400&q=60",
+  Udaipur: "https://images.unsplash.com/photo-1533154683836-84ea7a0bc310?w=400&q=60",
+  Rishikesh: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400&q=60",
+  Coorg: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=400&q=60",
+  Munnar: "https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?w=400&q=60",
+  Mumbai: "https://images.unsplash.com/photo-1566552881560-0be862a7c445?w=400&q=60",
+  Bali: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=400&q=60",
+  Lisbon: "https://images.unsplash.com/photo-1513735492246-483525079686?w=400&q=60",
+  Tokyo: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&q=60",
+  Santorini: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=400&q=60",
 };
 
-function Row({
+function destinationSubtitle(city: string) {
+  return DESTINATIONS.find((item) => item.title === city || item.query === city)?.subtitle ?? "Popular with guests";
+}
+
+function bestCover(items: ListingCardData[]) {
+  return [...items].sort((a, b) => b.avg_rating - a.avg_rating || b.review_count - a.review_count)[0];
+}
+
+function CoverPhoto({ src, alt }: { src?: string; alt: string }) {
+  const fallback = COVER_FALLBACKS[alt];
+  const [current, setCurrent] = useState(src || fallback);
+  useEffect(() => {
+    setCurrent(src || fallback);
+  }, [src, fallback]);
+  if (!current) {
+    return <img src="/icons/alt-destinations.png" alt="" className="h-full w-full object-contain p-2" />;
+  }
+  return (
+    <img
+      src={current}
+      alt=""
+      className="h-full w-full object-cover"
+      onError={() => {
+        if (fallback && current !== fallback) setCurrent(fallback);
+      }}
+    />
+  );
+}
+
+function DestinationRow({ cities }: { cities: [string, ListingCardData[]][] }) {
+  const { ref, edges, scrollPage } = useRowScroller(cities.length);
+
+  return (
+    <section>
+      <div className="flex items-start justify-between gap-4">
+        <div className="inline-flex h-7 items-center pl-0.5">
+          <h2 className="t-section-title">Destinations for you</h2>
+          <span className="row-title-arrow ml-1.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-[14px] bg-quaternary text-ink" aria-hidden>
+            <ChevronRight size={16} />
+          </span>
+        </div>
+        <div className="hidden gap-1 md:flex">
+          <ArrowButton label="Previous destinations" direction="left" disabled={!edges.prev} onClick={() => scrollPage(-1)} />
+          <ArrowButton label="Next destinations" direction="right" disabled={!edges.next} onClick={() => scrollPage(1)} />
+        </div>
+      </div>
+      <div ref={ref} className="dest-row no-scrollbar flex snap-x gap-3 overflow-x-auto">
+        {cities.slice(0, 12).map(([city, list]) => {
+          const cover = bestCover(list);
+          return (
+            <Link key={city} href={searchHref({ location: city })} className="w-[clamp(92px,11vw,124px)] shrink-0 snap-start">
+              <span className="block aspect-square w-full overflow-hidden rounded-xl bg-soft">
+                <CoverPhoto src={cover?.images[0] || COVER_FALLBACKS[city]} alt={city} />
+              </span>
+              <span className="t-destination-name mt-2 block truncate">{city}</span>
+              <span className="t-destination-tag block truncate">{destinationSubtitle(city)}</span>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function ListingRow({
   title,
   subtitle,
-  onTitle,
-  children,
+  href,
+  listings,
+  onNeedAuth,
 }: {
   title: string;
   subtitle?: string;
-  onTitle?: () => void;
-  children: React.ReactNode;
+  href: string;
+  listings: ListingCardData[];
+  onNeedAuth: () => void;
 }) {
-  const scroller = useRef<HTMLDivElement>(null);
-  const scrollBy = (distance: number) => scroller.current?.scrollBy({ left: distance, behavior: "smooth" });
+  const { ref, edges, scrollPage } = useRowScroller(listings.length + 1);
+  const photos = listings.map((listing) => listing.images[0]).filter(Boolean);
 
   return (
-    <section className="mt-10">
-      <div className="mb-4 flex items-end justify-between gap-4">
-        <div>
-          <button type="button" onClick={onTitle} className="t-section-title flex items-center text-left">
-            {title}
-            <span className="ml-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-quaternary transition-colors duration-200 hover:bg-quaternary-hover">
+    <section>
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1 md:flex-none">
+          <Link href={href} className="group flex max-w-full items-start justify-between gap-4 pl-0.5 md:inline-flex md:h-7 md:items-center md:justify-start md:gap-0">
+            <h2 className="t-section-title min-w-0 md:truncate">{title}</h2>
+            <span className="row-title-arrow flex h-7 w-7 shrink-0 items-center justify-center rounded-[14px] bg-quaternary text-ink group-hover:bg-quaternary-hover md:ml-1.5">
               <ChevronRight size={16} />
             </span>
-          </button>
-          {subtitle ? <p className="t-section-subtitle mt-0.5">{subtitle}</p> : null}
+          </Link>
+          {subtitle ? <p className="t-section-subtitle mt-0.5 pl-0.5">{subtitle}</p> : null}
         </div>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            aria-label="Scroll left"
-            onClick={() => scrollBy(-520)}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-hairline bg-white shadow-sm"
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <button
-            type="button"
-            aria-label="Scroll right"
-            onClick={() => scrollBy(520)}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-hairline bg-white shadow-sm"
-          >
-            <ChevronRight size={16} />
-          </button>
+        <div className="hidden shrink-0 gap-1 md:flex">
+          <ArrowButton label="Previous" direction="left" disabled={!edges.prev} onClick={() => scrollPage(-1)} />
+          <ArrowButton label="Next" direction="right" disabled={!edges.next} onClick={() => scrollPage(1)} />
         </div>
       </div>
-      <div ref={scroller} className="no-scrollbar flex gap-4 overflow-x-auto pb-2">
-        {children}
+      <div ref={ref} className="home-row no-scrollbar">
+        {listings.map((listing) => (
+          <div key={listing.id} className="home-row-card">
+            <ListingCard listing={listing} href={`/listings/${listing.id}`} variant="rail" onNeedAuth={onNeedAuth} />
+          </div>
+        ))}
+        <div className="home-row-card self-start">
+          <SeeAllTile href={href} photos={photos} />
+        </div>
       </div>
     </section>
   );
 }
 
 export function HomeRails({ items, onNeedAuth }: { items: ListingCardData[]; onNeedAuth: () => void }) {
-  const { setFilters } = useSearchFilters();
-  const byCity = new Map<string, ListingCardData[]>();
-  for (const item of items) {
-    const list = byCity.get(item.city) ?? [];
-    list.push(item);
-    byCity.set(item.city, list);
-  }
-  const cities = Array.from(byCity.entries());
+  const cities = useMemo(() => {
+    const byCity = new Map<string, ListingCardData[]>();
+    for (const item of items) {
+      const list = byCity.get(item.city) ?? [];
+      list.push(item);
+      byCity.set(item.city, list);
+    }
+    return Array.from(byCity.entries());
+  }, [items]);
 
-  const sections = cities.slice(0, 4).map(([city, list]) => {
-    const favourites = list.filter(isGuestFavourite);
-    const guestRow = favourites.length >= 2;
-    return {
-      city,
-      title: guestRow ? `Guest favourite homes in ${city}` : `Homes in ${city}`,
-      subtitle: guestRow ? "Guests often rate these homes highly" : undefined,
-      listings: guestRow ? favourites : list,
-    };
-  });
+  const sections = useMemo(
+    () =>
+      cities.slice(0, 4).map(([city, list]) => {
+        const favourites = list.filter(isGuestFavourite);
+        const guestRow = favourites.length >= 2;
+        return {
+          city,
+          title: guestRow ? `Guest favourite homes in ${city}` : `Homes in ${city}`,
+          subtitle: guestRow ? "Guests often rate these homes highly" : undefined,
+          listings: guestRow ? favourites : list,
+          href: searchHref({ location: city }),
+        };
+      }),
+    [cities],
+  );
+
+  if (cities.length === 0) return null;
 
   return (
-    <div>
-      <Row title="Destinations for you">
-        {cities.slice(0, 12).map(([city, list]) => {
-          const photo = list[0]?.images[0];
-          return (
-            <button
-              key={city}
-              type="button"
-              onClick={() => setFilters({ location: city })}
-              className="w-[148px] shrink-0 text-left"
-            >
-              <div className="relative aspect-square overflow-hidden rounded-2xl bg-soft">
-                {photo ? <Image src={photo} alt="" fill className="object-cover" sizes="148px" /> : null}
-              </div>
-              <p className="mt-2 text-card font-medium text-ink">{city}</p>
-              <p className="text-meta text-muted">{BLURBS[city] ?? "Popular with guests"}</p>
-            </button>
-          );
-        })}
-      </Row>
+    <div className="space-y-6 md:space-y-10">
+      <DestinationRow cities={cities} />
       {sections.map((section) => (
-        <Row
+        <ListingRow
           key={section.title}
           title={section.title}
           subtitle={section.subtitle}
-          onTitle={() => setFilters({ location: section.city })}
-        >
-          {section.listings.map((listing) => (
-            <div key={listing.id} className="w-[260px] shrink-0">
-              <ListingCard listing={listing} href={`/listings/${listing.id}`} onNeedAuth={onNeedAuth} />
-            </div>
-          ))}
-        </Row>
+          href={section.href}
+          listings={section.listings}
+          onNeedAuth={onNeedAuth}
+        />
       ))}
     </div>
   );

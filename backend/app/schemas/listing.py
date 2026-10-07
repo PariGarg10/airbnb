@@ -144,6 +144,7 @@ class StayQuote(BaseModel):
     total: int
     original_total: int
     total_original: int
+    is_rare_find: bool = False
 
 
 class CategoryCount(BaseModel):

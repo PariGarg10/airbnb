@@ -11,6 +11,7 @@ import { FiltersModal } from "@/components/search/FiltersModal";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { listingsApi } from "@/lib/api";
 import { formatResultsHeading } from "@/lib/format";
+import { useMinWidth } from "@/hooks/useMinWidth";
 import { useSearchFilters } from "@/hooks/useSearchFilters";
 
 const ListingsMap = dynamic(() => import("@/components/listings/ListingsMap"), {
@@ -107,6 +108,8 @@ export function SearchResults() {
   const heading = useMemo(() => formatResultsHeading(total, filters.location), [filters.location, total]);
 
   const showMap = mapExpanded || mobileMap;
+  const desktopMap = useMinWidth(1128);
+  const mountMap = desktopMap || mobileMap || mapExpanded;
 
   if (listings.isLoading && items.length === 0) {
     return <ResultsLoadingSkeleton mapHidden={mapExpanded} />;
@@ -177,8 +180,9 @@ export function SearchResults() {
           >
             {listings.isLoading ? (
               <Skeleton className="search-map h-full w-full" />
-            ) : (
+            ) : mountMap ? (
               <ListingsMap
+                key={mobileMap ? "search-map-mobile" : "search-map-desktop"}
                 listings={items}
                 filters={filters}
                 boundsKey={boundsKey}
@@ -193,7 +197,7 @@ export function SearchResults() {
                 }}
                 onNeedAuth={() => setAuthOpen(true)}
               />
-            )}
+            ) : null}
           </div>
         </div>
       </div>

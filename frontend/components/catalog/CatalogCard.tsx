@@ -1,15 +1,18 @@
 "use client";
 
 import { Heart, Star } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { toastComingSoonWishlist } from "@/lib/toastUi";
 import { formatInr, formatRating } from "@/lib/format";
 import type { CatalogItem } from "@/lib/mock/experiences";
 
+const CATALOG_FALLBACK =
+  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=400&q=60";
+
 export function CatalogCard({ item }: { item: CatalogItem }) {
   const [saved, setSaved] = useState(false);
+  const [imageSrc, setImageSrc] = useState(item.image);
 
   const save = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -22,12 +25,15 @@ export function CatalogCard({ item }: { item: CatalogItem }) {
     <article className="group rounded-[var(--card-radius)]">
       <Link href="/coming-soon" className="catalog-card block w-full cursor-pointer">
         <div className="relative aspect-[20/19] overflow-hidden rounded-[var(--card-radius)] bg-[var(--image-placeholder)] rail-image">
-          <Image
-            src={item.image}
+          <img
+            src={imageSrc}
             alt=""
-            fill
-            sizes="280px"
-            className="object-cover transition duration-200 group-hover:brightness-[0.92]"
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover transition duration-200 group-hover:brightness-[0.92]"
+            onError={() => {
+              if (imageSrc !== CATALOG_FALLBACK) setImageSrc(CATALOG_FALLBACK);
+            }}
           />
           {item.badge ? (
             <span className="t-guest-pill absolute left-3 top-3 inline-flex max-w-[calc(100%-60px)] rounded-[var(--r-badge)] border border-white/50 bg-white/80 px-[9.5px] py-[5.5px] shadow-badge backdrop-blur-[32px]">

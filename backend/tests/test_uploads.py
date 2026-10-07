@@ -40,7 +40,7 @@ def test_upload_rejects_wrong_type_and_size(api):
     assert saved.status_code == 200
     url = saved.json()["url"]
     path = urlparse(url).path
-    assert path.startswith("/static/uploads/")
+    assert path.startswith("/uploads/")
     assert path.endswith(".png")
     fetched = client.get(path)
     assert fetched.status_code == 200

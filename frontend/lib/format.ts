@@ -1,4 +1,4 @@
-import { format, parseISO } from "date-fns";
+import { addDays, format, parseISO } from "date-fns";
 import type { PropertyType, RoomType } from "@/types";
 
 const PROPERTY_LABELS: Record<PropertyType, string> = {
@@ -99,6 +99,42 @@ export function formatListingStaySubtitle(checkIn: string, checkOut: string): st
 export function formatGuests(count?: number): string {
   if (!count || count < 1) return "Add guests";
   return count === 1 ? "1 guest" : `${count} guests`;
+}
+
+/** Checkout summary guest line (omit zero counts). */
+export function formatCheckoutGuestSummary(adults: number, children: number, infants: number, pets = 0): string {
+  const parts: string[] = [];
+  if (adults > 0) parts.push(`${adults} ${adults === 1 ? "adult" : "adults"}`);
+  if (children > 0) parts.push(`${children} ${children === 1 ? "child" : "children"}`);
+  if (infants > 0) parts.push(`${infants} ${infants === 1 ? "infant" : "infants"}`);
+  if (pets > 0) parts.push(`${pets} ${pets === 1 ? "pet" : "pets"}`);
+  return parts.length > 0 ? parts.join(", ") : "1 adult";
+}
+
+/** Price breakdown modal date span (e.g. 9–11 Oct). */
+export function formatBreakdownStayRange(checkIn: string, checkOut: string): string {
+  const start = parseISO(checkIn);
+  const end = addDays(parseISO(checkOut), -1);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return "";
+  if (start.getFullYear() === end.getFullYear() && start.getMonth() === end.getMonth()) {
+    return `${format(start, "d")}–${format(end, "d MMM")}`;
+  }
+  if (start.getFullYear() === end.getFullYear()) {
+    return `${format(start, "d MMM")} – ${format(end, "d MMM")}`;
+  }
+  return `${format(start, "d MMM, yyyy")} – ${format(end, "d MMM, yyyy")}`;
+}
+
+export function formatFreeCancelBefore(checkIn: string): string {
+  const dayBefore = addDays(parseISO(checkIn), -1);
+  if (Number.isNaN(dayBefore.getTime())) return "check-in";
+  return format(dayBefore, "d MMMM");
+}
+
+/** Checkout summary card — matches booking cancellation policy (not “free cancel” only). */
+export function formatCheckoutCancellationSummary(checkIn: string): string {
+  const deadline = formatFreeCancelBefore(checkIn);
+  return `Cancel before ${deadline}, 3:00 pm for a full refund. After that, a partial refund applies if you cancel before check-in.`;
 }
 
 /** Stay range on search-result cards (e.g. `12–17 Oct`). */

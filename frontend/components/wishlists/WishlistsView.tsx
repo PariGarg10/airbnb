@@ -36,6 +36,7 @@ export function WishlistsView() {
     queryKey: ["wishlists", user?.id],
     queryFn: wishlistApi.list,
     enabled: Boolean(user),
+    refetchOnMount: "always",
   });
 
   if (isLoading) {

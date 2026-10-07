@@ -6,6 +6,7 @@ import { BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { HostPendingRequests } from "@/components/host/HostPendingRequests";
 import { HostStatsStrip } from "@/components/host/HostStatsStrip";
 import { Avatar } from "@/components/ui/Avatar";
 import { GlidePill } from "@/components/ui/Glide";
@@ -62,6 +63,7 @@ export function HostReservationsPanel() {
           </button>
         ))}
       </GlidePill>
+      <HostPendingRequests />
       <div className="mt-8">
         <HostStatsStrip />
       </div>
