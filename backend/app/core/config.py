@@ -3,12 +3,7 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-LOCAL_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:3001",
-]
+LOCAL_ORIGINS = ["http://localhost:3000"]
 
 
 class Settings(BaseSettings):

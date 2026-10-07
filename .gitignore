@@ -1,6 +1,7 @@
 # Local tools
 .cursor/
 .playwright-mcp/
+.pw-profile/
 .vscode/
 .idea/
 
@@ -20,9 +21,11 @@ __pycache__/
 *.sqlite
 *.sqlite3
 .env
+.env.local
 .env.*
 !.env.example
 uploads/
+backend/uploads/
 static/uploads/
 
 # Node / Next.js
@@ -38,6 +41,11 @@ yarn-error.log*
 
 # Reference screenshots used while designing. Not part of the app.
 design-refs/
+
+# Visual audit tooling (Chrome profiles + generated diffs)
+frontend/scripts/visual-audit/.profile/
+frontend/scripts/visual-audit/.profile-*/
+frontend/scripts/visual-audit/output/
 
 # OS
 .DS_Store

@@ -6,8 +6,22 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "i.pravatar.cc" },
-      { protocol: "http", hostname: "localhost", port: "8000" },
-      { protocol: "https", hostname: "**.onrender.com" },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "8000",
+        pathname: "/static/uploads/**",
+      },
+      {
+        protocol: "https",
+        hostname: "**.onrender.com",
+        pathname: "/static/uploads/**",
+      },
+      {
+        protocol: "https",
+        hostname: "**.up.railway.app",
+        pathname: "/static/uploads/**",
+      },
     ],
   },
 };

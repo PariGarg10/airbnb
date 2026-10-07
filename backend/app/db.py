@@ -1,9 +1,12 @@
 from collections.abc import Generator
+from pathlib import Path
 
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.core.config import settings
+
+Path(settings.DATA_DIR).mkdir(parents=True, exist_ok=True)
 
 engine = create_engine(
     settings.database_url,
