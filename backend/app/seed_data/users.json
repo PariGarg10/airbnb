@@ -1,0 +1,66 @@
+[
+  {
+    "name": "Ananya Mehta",
+    "email": "ananya.mehta@example.com",
+    "avatar_url": "https://i.pravatar.cc/150?img=12",
+    "bio": "Architect in Goa. I host places I would book for a long weekend with friends.",
+    "is_host": true,
+    "is_superhost": true
+  },
+  {
+    "name": "Rohan Kapoor",
+    "email": "rohan.kapoor@example.com",
+    "avatar_url": "https://i.pravatar.cc/150?img=15",
+    "bio": "I look after mountain stays and answer messages before the kettle boils.",
+    "is_host": true,
+    "is_superhost": true
+  },
+  {
+    "name": "Meera Iyer",
+    "email": "meera.iyer@example.com",
+    "avatar_url": "https://i.pravatar.cc/150?img=32",
+    "bio": "Interior stylist. My listings are for people who cook dinner and stay in.",
+    "is_host": true,
+    "is_superhost": false
+  },
+  {
+    "name": "Arjun Deshmukh",
+    "email": "arjun.deshmukh@example.com",
+    "avatar_url": "https://i.pravatar.cc/150?img=33",
+    "bio": "I host heritage homes and city rooms, and I am serious about hot water.",
+    "is_host": true,
+    "is_superhost": false
+  },
+  {
+    "name": "Sofia Alvarez",
+    "email": "sofia.alvarez@example.com",
+    "avatar_url": "https://i.pravatar.cc/150?img=47",
+    "bio": "Product designer from Mexico City. I travel with a sketchbook and too many snacks.",
+    "is_host": false,
+    "is_superhost": false
+  },
+  {
+    "name": "Liam Okafor",
+    "email": "liam.okafor@example.com",
+    "avatar_url": "https://i.pravatar.cc/150?img=52",
+    "bio": "Lagos-born and London-based. I book a place with a real kitchen whenever I can.",
+    "is_host": false,
+    "is_superhost": false
+  },
+  {
+    "name": "Priya Nair",
+    "email": "priya.nair@example.com",
+    "avatar_url": "https://i.pravatar.cc/150?img=49",
+    "bio": "Writer in Bengaluru. I collect quiet rooms and good recommendations for breakfast.",
+    "is_host": false,
+    "is_superhost": false
+  },
+  {
+    "name": "Kenji Watanabe",
+    "email": "kenji.watanabe@example.com",
+    "avatar_url": "https://i.pravatar.cc/150?img=68",
+    "bio": "Photographer from Kyoto. I like neighborhoods more than landmarks.",
+    "is_host": false,
+    "is_superhost": false
+  }
+]

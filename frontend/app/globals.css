@@ -1,0 +1,1270 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #ffffff;
+  --bg-hover: #f7f7f7;
+  --bg-row-hover: #f4f4f4;
+  --bg-secondary: #f7f7f7;
+  --bg-tertiary: #ebebeb;
+  --bg-quaternary: #f2f2f2;
+  --bg-quaternary-hover: #ebebeb;
+  --bg-disabled: #f2f2f2;
+  --bg-inverse: #222222;
+  --bg-inverse-hover: #3f3f3f;
+  --bg-inverse-disabled: #dddddd;
+  --bg-error: #fff5f3;
+  --error: #c13515;
+  --error-hover: #a3150f;
+  --success-bg: #e6f6e9;
+  --brand: #ff385c;
+  --brand-tertiary: #da1249;
+  --brand-gradient: linear-gradient(to right, #e61e4d 0%, #e31c5f 50%, #d70466 100%);
+  --brand-gradient-hover: radial-gradient(circle at center, #ff385c 0%, #e61e4d 27.5%, #e31c5f 40%, #d70466 57.5%, #bd1e59 75%, #bd1e59 100%);
+  --text: #222222;
+  --text-muted: #6c6c6c;
+  --text-disabled: #c1c1c1;
+  --border: #dddddd;
+  --divider: #ebebeb;
+  --r-4: 4px;
+  --r-8: 8px;
+  --r-12: 12px;
+  --r-16: 16px;
+  --r-20: 20px;
+  --r-24: 24px;
+  --r-28: 28px;
+  --r-32: 32px;
+  --shadow-tertiary: 0 2px 4px rgba(0, 0, 0, 0.18);
+  --shadow-secondary: 0 6px 16px rgba(0, 0, 0, 0.12);
+  --shadow-primary: 0 6px 20px rgba(0, 0, 0, 0.2);
+  --shadow-high: 0 8px 28px rgba(0, 0, 0, 0.28);
+  --filters-modal-w: 784px;
+  --listing-nav-h: 64px;
+  --listing-sidebar-w: 400px;
+  --listing-main-gap: 80px;
+  --border-elevated: 1px solid rgba(0, 0, 0, 0.04);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --spring-fast: linear(0, 0.1856, 0.4653, 0.6823, 0.8223, 0.905, 0.9513, 0.9764, 0.9896, 0.9965, 1);
+  --spring-fast-dur: 450ms;
+  --spring-standard: linear(0, 0.1579, 0.4147, 0.6303, 0.7802, 0.8751, 0.9318, 0.9642, 0.9823, 0.9921, 0.9973, 1);
+  --spring-standard-dur: 584ms;
+  --header-h: 80px;
+  /* Header geometry on the home / explore pages (measured on airbnb.co.in @1440, see DESIGN.md §Header). */
+  --header-h-tall: 96px;
+  --header-expanded-h: 200px;
+  --header-gradient: linear-gradient(180deg, #ffffff 39.9%, #f8f8f8 100%);
+  --header-hairline: #ebebeb;
+  --search-bar-h: 66px;
+  --search-bar-w: 850px;
+  --search-bar-inset: 10px;
+  --search-btn: 48px;
+  --search-btn-expanded: 118px;
+  --when-panel-w: 850px;
+  --search-who-pr: 130.9px;
+  /* Colour behind a photo while it loads (Airbnb: #ddd on the radius-20 clip box). */
+  --image-placeholder: #dddddd;
+  --brand-solid: var(--brand-tertiary);
+  --shadow-search: 0 0 0 1px rgba(0, 0, 0, 0.02), 0 8px 24px rgba(0, 0, 0, 0.1);
+  --shadow-badge: 0 0 0 1px rgba(0, 0, 0, 0.02), 0 2px 6px rgba(0, 0, 0, 0.04), 0 4px 8px rgba(0, 0, 0, 0.1);
+  --r-mobile-search: 40px;
+  --shadow-mobile-search: 0 6px 20px rgba(0, 0, 0, 0.1);
+  --stack-shift: 87px;
+  --fade-dur: 175ms;
+  --compact-pill-h: 46px;
+  --r-compact-pill: 40px;
+  --r-compact-seg-l: 40px 4px 4px 40px;
+  --r-compact-seg: 4px;
+  --r-compact-seg-r: 4px 40px 40px 4px;
+  --shadow-compact-pill: 0 1px 2px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-rail-image-mobile: 0 0 0 1px rgba(0, 0, 0, 0.02), 0 8px 24px rgba(0, 0, 0, 0.1);
+  --ease-chip: cubic-bezier(0.1, 0.9, 0.2, 1);
+  --shadow-chip:
+    0 3px 2.5px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.15), 0 0.8px 0.4px rgba(0, 0, 0, 0.15),
+    inset 0 1px 1.5px #fff, inset 0 10px 15px rgba(58, 58, 58, 0.02), inset 0 -1.5px 0.8px rgba(255, 255, 255, 0.6),
+    inset 0 -1.5px 0.75px rgba(0, 0, 0, 0.3);
+  --shadow-chip-active:
+    0 1px 0.5px #fff, 0 -0.5px 1px rgba(0, 0, 0, 0.15), 0 -1.2px 0.5px 1px rgba(0, 0, 0, 0.05), 0 8px 16px rgba(0, 0, 0, 0.05),
+    inset -0.2px -1px 1px #fff, inset 0.5px 0.7px 2.5px rgba(0, 0, 0, 0.2), inset -1px -3px 8px rgba(0, 0, 0, 0.05),
+    inset 0.5px 2px 4px rgba(0, 0, 0, 0.1), inset 1px 6px 6px 2px rgba(0, 0, 0, 0.1);
+  --mobile-nav-h: 64px;
+  --mobile-chips-h: 78px; /* 16 top + 40 chip + 22 bottom: Airbnb's 80px band overlaps the first heading by 2px */
+  --tab-gap: 35px;
+  --tab-underline-top: 44px;
+  --tab-underline-inset: 3px;
+  --r-search-bar: 100px;
+  --r-search-segment: 32px;
+  --r-btn-round: 50px;
+  --r-badge: 14px;
+  --r-ctrl: 12px;
+  --page-px: 16px;
+  --page-gutter: 16px;
+  --card-radius: var(--r-20);
+  /* Search results split map + list (desktop ≥1128, measured on airbnb.co.in). */
+  --search-filter-row-h: 64px;
+  --search-map-sticky-top: calc(var(--header-h) + 1px);
+  --search-map-inset-b: 24px;
+  --search-list-w: 58.333%;
+  --search-map-w: 41.667%;
+  --r-map-panel: var(--r-24);
+  --search-results-grid-gap-x: 24px;
+  --search-results-grid-gap-y: 40px;
+}
+
+@media (min-width: 375px) {
+  :root {
+    --page-px: 24px;
+    --page-gutter: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --page-px: 40px;
+    --page-gutter: 40px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --page-px: 48px;
+    --page-gutter: 48px;
+  }
+}
+
+html {
+  overflow-anchor: none;
+  font-feature-settings: "ss01" off;
+}
+
+body {
+  font-size: 14px;
+  line-height: 1.43;
+  letter-spacing: normal;
+  color: var(--text);
+  background: var(--bg);
+  font-feature-settings: "ss01" off;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  overflow-anchor: none;
+}
+
+.search-fill {
+  background: var(--brand-gradient);
+}
+
+.search-fill:hover {
+  background: var(--brand-gradient-hover);
+}
+
+/* Header search icon button: solid #da1249 at rest, the linear gradient on hover (instant, like Airbnb). */
+.search-submit {
+  background: var(--brand-solid);
+}
+
+.search-submit:hover {
+  background: var(--brand-gradient);
+}
+
+@layer components {
+  .t-mobile-nav { font-size: 10px; line-height: 12px; font-weight: 400; }
+  .t-mobile-nav-active { font-size: 10px; line-height: 12px; font-weight: 500; }
+  .t-mobile-chip { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text); }
+  .t-wordmark { font-size: 22px; line-height: 26px; font-weight: 700; letter-spacing: -0.02em; }
+  .t-tab { font-size: 14px; line-height: 18px; font-weight: 500; color: var(--text-muted); }
+  .t-tab-active { font-size: 14px; line-height: 18px; font-weight: 500; color: var(--text); }
+  .t-hosting { font-size: 14px; line-height: 18px; font-weight: 500; color: var(--text); }
+  .t-avatar-initial { font-size: 16px; line-height: 20px; font-weight: 500; color: #7a3e1d; }
+  .t-search-label { font-size: 12px; line-height: 16px; font-weight: 500; color: var(--text); }
+  .t-search-value { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text-muted); }
+  .t-search-value-filled { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text); }
+  .t-search-value-filled::placeholder { color: var(--text-muted); font-weight: 400; }
+  .t-search-button { font-size: 16px; line-height: 20px; font-weight: 600; color: #ffffff; }
+  .t-compact { font-size: 14px; line-height: 18px; font-weight: 500; color: var(--text); }
+  .t-compact-pill { font-size: 14px; line-height: 22px; font-weight: 500; color: var(--text); transition: opacity 150ms cubic-bezier(0, 0, 1, 1) 150ms; }
+  .t-dropdown-heading { font-size: 12px; line-height: 16px; font-weight: 400; color: var(--text); }
+  .t-dropdown-dest-title { font-size: 14px; line-height: 18px; font-weight: 500; color: var(--text); }
+  .t-dropdown-dest-subtitle { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text-muted); margin-top: 2px; }
+  .t-guest-row-title { font-size: 16px; line-height: 20px; font-weight: 500; color: var(--text); }
+  .t-dropdown-subtitle { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text-muted); }
+  .t-when-section-title { font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text); text-align: center; }
+  .t-menu-item { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text); }
+  .t-menu-item-strong { font-size: 14px; line-height: 18px; font-weight: 500; color: var(--text); }
+  .t-section-title { font-size: 20px; line-height: 24px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+  .t-section-subtitle { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text-muted); }
+  .t-rail-title { font-size: 13px; line-height: 16px; font-weight: 500; color: var(--text); }
+  .t-rail-meta { font-size: 12px; line-height: 16px; font-weight: 400; color: var(--text-muted); }
+  .t-promo-subtitle { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text-muted); }
+  .t-destination-name { font-size: 14px; line-height: 18px; font-weight: 600; color: var(--text); }
+  .t-destination-tag { font-size: 12px; line-height: 16px; font-weight: 400; color: var(--text-muted); }
+  .t-promo-title { font-size: 18px; line-height: 22px; font-weight: 500; color: var(--text); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .t-promo-button { font-size: 14px; line-height: 18px; font-weight: 500; color: var(--text); }
+  .t-card-title { font-size: 15px; line-height: 19px; font-weight: 500; color: var(--text); }
+  .t-meta { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text-muted); }
+  .t-guest-pill { font-size: 11px; line-height: 13px; font-weight: 600; color: var(--text); }
+  .t-guest-pill-lg { font-size: 13px; line-height: 16px; font-weight: 600; color: var(--text); }
+  .t-results-heading { font-size: 20px; line-height: 24px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+  .t-results-fees { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text-muted); }
+  .t-results-title { font-size: 15px; line-height: 19px; font-weight: 500; color: var(--text); }
+  .t-results-rating { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text); }
+  .t-results-subtitle { font-size: 15px; line-height: 19px; font-weight: 400; color: var(--text-muted); }
+  .t-results-price-line { font-size: 15px; line-height: 19px; color: var(--text); text-decoration: underline; text-underline-offset: 2px; }
+  .t-results-price-strong { font-weight: 600; }
+  .t-results-price-tail { font-weight: 400; }
+  .t-results-strike { font-size: 15px; line-height: 19px; font-weight: 400; color: var(--text-muted); text-decoration: line-through; }
+  .t-results-footnote { font-size: 15px; line-height: 19px; font-weight: 400; color: var(--text-muted); }
+  .t-superhost-pill { font-size: 11px; line-height: 13px; font-weight: 600; color: #ffffff; }
+  .t-chip { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text); }
+  .t-chip-selected { color: #ffffff; }
+  .t-price-pin { font-size: 14px; line-height: 18px; font-weight: 600; color: var(--text); }
+  .t-listing-title { font-size: 26px; line-height: 30px; font-weight: 600; color: var(--text); letter-spacing: -0.0325rem; }
+  .t-overview { font-size: 22px; line-height: 26px; font-weight: 600; color: var(--text); letter-spacing: -0.0275rem; }
+  .t-facts { font-size: 16px; line-height: 20px; font-weight: 400; color: var(--text); }
+  .t-heading { font-size: 22px; line-height: 26px; font-weight: 600; color: var(--text); letter-spacing: -0.0275rem; }
+  .t-body { font-size: 16px; line-height: 24px; font-weight: 400; color: var(--text); }
+  .t-amenity { font-size: 16px; line-height: 20px; font-weight: 400; color: var(--text); }
+  .t-host-name { font-size: 32px; line-height: 36px; font-weight: 700; color: var(--text); letter-spacing: -0.06rem; }
+  .t-stat-number { font-size: 22px; line-height: 26px; font-weight: 700; color: var(--text); }
+  .t-stat-label { font-size: 10px; line-height: 12px; font-weight: 600; color: var(--text); }
+  .t-review-name { font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text); }
+  .t-review-meta { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text-muted); }
+  .t-review-text { font-size: 16px; line-height: 24px; font-weight: 400; color: var(--text); }
+  .t-rating-display { font-size: 64px; line-height: 68px; font-weight: 600; color: var(--text); letter-spacing: -0.03em; }
+  .t-reserve-price { font-size: 22px; line-height: 26px; font-weight: 600; color: var(--text); text-decoration: underline; }
+  .t-reserve-nights { font-size: 16px; line-height: 20px; font-weight: 400; color: var(--text); }
+  .t-field-label { font-size: 10px; line-height: 12px; font-weight: 700; color: var(--text); letter-spacing: 0.04em; text-transform: uppercase; }
+  .t-field-value { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text); }
+  .t-reserve-button { font-size: 16px; line-height: 20px; font-weight: 600; color: #ffffff; }
+  .t-reassure { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text-muted); }
+  .t-price-row { font-size: 16px; line-height: 20px; font-weight: 400; color: var(--text); }
+  .t-total { font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text); }
+  .t-page-title { font-size: 32px; line-height: 36px; font-weight: 600; color: var(--text); letter-spacing: -0.06rem; }
+  .t-subheading { font-size: 22px; line-height: 26px; font-weight: 600; color: var(--text); letter-spacing: -0.0275rem; }
+  .t-row-label { font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text); }
+  .t-row-value { font-size: 16px; line-height: 20px; font-weight: 400; color: var(--text); }
+  .t-wizard-title { font-size: 32px; line-height: 36px; font-weight: 600; color: var(--text); letter-spacing: -0.06rem; }
+  .t-wizard-subtitle { font-size: 18px; line-height: 24px; font-weight: 400; color: var(--text-muted); letter-spacing: -0.01125rem; }
+  @media (min-width: 1128px) {
+    .t-wizard-intro-title {
+      font-size: 48px;
+      line-height: 52px;
+      font-weight: 600;
+      letter-spacing: -0.04em;
+    }
+  }
+  .t-step-label { font-size: 18px; line-height: 24px; font-weight: 600; color: var(--text); letter-spacing: -0.01125rem; }
+  .t-editor-title { font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text); }
+  .t-editor-summary { font-size: 16px; line-height: 20px; font-weight: 400; color: var(--text-muted); }
+  .t-modal-title { font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text); }
+  .t-modal-body { font-size: 16px; line-height: 24px; font-weight: 400; color: var(--text); }
+  .t-button { font-size: 16px; line-height: 20px; font-weight: 600; }
+  .t-link { font-size: 16px; line-height: 20px; font-weight: 600; color: var(--text); text-decoration: underline; }
+  .t-toast { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text); }
+  .t-toast-strong { font-size: 14px; line-height: 18px; font-weight: 600; color: var(--text); }
+  .t-toast-action { font-size: 14px; line-height: 18px; font-weight: 600; color: var(--text); text-decoration: underline; }
+  .t-footer-heading { font-size: 14px; line-height: 18px; font-weight: 500; color: var(--text); }
+  .t-footer-ctrl { font-size: 14px; line-height: 18px; font-weight: 500; color: var(--text); }
+  .t-footer-link { font-size: 14px; line-height: 18px; font-weight: 400; color: var(--text); }
+}
+
+@keyframes wizard-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.wizard-step-panel {
+  animation: wizard-step-in 200ms ease-out;
+}
+
+@keyframes wizard-dot-pulse {
+  0%,
+  80%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.wizard-loading-dot {
+  animation: wizard-dot-pulse 1s ease-in-out infinite;
+}
+
+@keyframes airbnb-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.modal-panel {
+  animation: airbnb-pop var(--spring-standard-dur) var(--spring-standard);
+}
+
+.search-panel,
+.dropdown-pop {
+  animation: airbnb-pop var(--spring-fast-dur) var(--spring-fast);
+}
+
+@keyframes airbnb-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 639px) {
+  .modal-panel {
+    animation: airbnb-slide-up var(--spring-standard-dur) var(--spring-standard);
+  }
+}
+
+@keyframes heart-pop {
+  from {
+    transform: scale(0.92);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes airbnb-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: #ebebeb;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.55) 50%, transparent 100%);
+  animation: airbnb-shimmer 1.2s ease-in-out infinite;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+[data-sonner-toaster] {
+  --width: 380px !important;
+  font-family: inherit !important;
+}
+
+[data-sonner-toast][data-styled="true"] {
+  background: #ffffff !important;
+  color: var(--text) !important;
+  border: none !important;
+  border-radius: 16px !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18) !important;
+  padding: 16px !important;
+  font-size: 14px !important;
+  line-height: 20px !important;
+  width: min(380px, calc(100vw - 48px)) !important;
+  max-width: 380px !important;
+}
+
+[data-sonner-toast][data-styled="true"] [data-title] {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text);
+}
+
+[data-sonner-toast][data-styled="true"] [data-description] {
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 18px;
+}
+
+[data-sonner-toast][data-styled="true"] [data-button] {
+  background: transparent !important;
+  color: var(--text) !important;
+  height: auto !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: 14px !important;
+  line-height: 20px !important;
+  font-weight: 500 !important;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+[data-sonner-toast][data-styled="true"] [data-icon] svg {
+  color: var(--brand);
+}
+
+[data-sonner-toast][data-styled="true"]:has(.toast-thumb) {
+  gap: 12px !important;
+}
+
+[data-sonner-toast][data-styled="true"] [data-icon]:has(.toast-thumb) {
+  width: 48px;
+  height: 48px;
+  margin: 0;
+}
+
+.toast-thumb {
+  display: block;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.airbnb-calendar {
+  --rdp-accent-color: var(--text);
+  --rdp-accent-background-color: var(--bg-secondary);
+  --rdp-today-color: var(--text);
+  --rdp-range_middle-background-color: var(--bg-secondary);
+  --rdp-range_middle-color: var(--text);
+  --rdp-range_start-color: #ffffff;
+  --rdp-range_end-color: #ffffff;
+  --rdp-range_start-date-background-color: var(--text);
+  --rdp-range_end-date-background-color: var(--text);
+  --rdp-day-height: 48px;
+  --rdp-day-width: 48px;
+  --rdp-day_button-height: 48px;
+  --rdp-day_button-width: 48px;
+  --rdp-day_button-border-radius: 999px;
+  --rdp-selected-border: 0;
+  --rdp-disabled-opacity: 1;
+  --rdp-nav_button-width: 32px;
+  --rdp-nav_button-height: 32px;
+  --rdp-nav-height: 40px;
+}
+
+.airbnb-calendar .rdp-month_caption,
+.airbnb-calendar .rdp-caption_label {
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.airbnb-calendar .rdp-weekday {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.airbnb-calendar .rdp-day_button {
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 400;
+  border: 1px solid transparent;
+}
+
+.airbnb-calendar .rdp-range_start .rdp-day_button,
+.airbnb-calendar .rdp-range_end .rdp-day_button {
+  font-weight: 600;
+}
+
+.airbnb-calendar .rdp-today:not(.rdp-outside):not(.rdp-range_start):not(.rdp-range_end) .rdp-day_button {
+  color: var(--text);
+  border-color: var(--text);
+}
+
+.airbnb-calendar .rdp-disabled .rdp-day_button {
+  color: #b0b0b0;
+  text-decoration: none;
+}
+
+.airbnb-calendar .is-booked .rdp-day_button {
+  color: #b0b0b0;
+  text-decoration: line-through;
+}
+
+.airbnb-calendar .rdp-day:not(.rdp-disabled):not(.rdp-range_start):not(.rdp-range_end):not(.rdp-selected) .rdp-day_button:hover {
+  border-color: var(--text);
+  background-color: transparent;
+}
+
+.airbnb-calendar .rdp-range_middle .rdp-day_button {
+  border-radius: 0;
+  border-color: transparent;
+}
+
+.airbnb-calendar .rdp-button_previous,
+.airbnb-calendar .rdp-button_next {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  color: var(--text);
+}
+
+.airbnb-calendar .rdp-button_previous:hover,
+.airbnb-calendar .rdp-button_next:hover {
+  background: var(--bg-secondary);
+}
+
+.airbnb-calendar .rdp-button_previous:disabled,
+.airbnb-calendar .rdp-button_next:disabled,
+.airbnb-calendar .rdp-button_previous[aria-disabled="true"],
+.airbnb-calendar .rdp-button_next[aria-disabled="true"] {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.when-mode-toggle {
+  display: flex;
+  border-radius: 999px;
+  background: var(--divider);
+  padding: 4px;
+}
+
+.when-mode-tab {
+  border-radius: 999px;
+  padding: 8px 20px;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.when-mode-tab-active {
+  background: #ffffff;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+}
+
+.when-flex-chip {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: var(--bg-secondary);
+  padding: 8px 16px;
+  font-size: 14px;
+  line-height: 18px;
+  color: var(--text);
+}
+
+.when-flex-chip-active {
+  border: 1px solid var(--text);
+  background: #ffffff;
+}
+
+.when-stay-chip {
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  padding: 8px 16px;
+  font-size: 14px;
+  line-height: 18px;
+  color: var(--text);
+}
+
+.when-stay-chip-active {
+  border: 2px solid var(--text);
+  padding: 7px 15px;
+}
+
+.when-month-tile {
+  display: flex;
+  height: 132px;
+  width: 120px;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: var(--r-16);
+  border: 1px solid var(--border);
+  background: #ffffff;
+}
+
+.when-month-tile-active {
+  border: 2px solid var(--text);
+}
+
+.when-month-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 10;
+  display: flex;
+  height: 32px;
+  width: 32px;
+  transform: translateY(-50%);
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: var(--text);
+}
+
+.when-month-nav:hover {
+  background: var(--bg-secondary);
+}
+
+.when-month-nav-prev {
+  left: 0;
+}
+
+.when-month-nav-next {
+  right: 0;
+}
+
+.search-map {
+  border-radius: var(--r-map-panel);
+}
+
+@media (min-width: 1128px) {
+  .search-map {
+    border-radius: var(--r-map-panel);
+  }
+}
+
+.search-map .leaflet-container,
+.listing-map .leaflet-container {
+  background: #ebebeb;
+  font-family: inherit;
+  border-radius: inherit;
+  height: 100% !important;
+  width: 100%;
+  z-index: 0;
+}
+
+.listing-map .leaflet-tile-pane {
+  z-index: 1;
+}
+
+.search-map .leaflet-tile {
+  opacity: 0;
+  transition: opacity 200ms linear;
+}
+
+.search-map .leaflet-tile-loaded {
+  opacity: 1;
+}
+
+.search-map .price-pin-icon {
+  background: transparent;
+  border: none;
+}
+
+.search-map .price-pin {
+  transform: translate(-50%, -50%);
+  transition: transform 200ms;
+}
+
+.search-map .price-pin:hover {
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.range-thumb {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+}
+
+.range-thumb::-webkit-slider-thumb {
+  pointer-events: auto;
+  height: 28px;
+  width: 28px;
+  appearance: none;
+  cursor: pointer;
+  border-radius: 999px;
+  border: 1px solid #222222;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+
+.range-thumb::-moz-range-thumb {
+  pointer-events: auto;
+  height: 28px;
+  width: 28px;
+  cursor: pointer;
+  border-radius: 999px;
+  border: 1px solid #222222;
+  background: #ffffff;
+}
+
+@keyframes save-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes save-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes save-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.save-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  animation: save-overlay-in 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.save-panel {
+  animation: save-panel-in 300ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (min-width: 1128px) {
+  .filters-modal-overlay {
+    background: rgba(0, 0, 0, 0.6);
+    animation: save-overlay-in 200ms var(--ease-standard);
+  }
+
+  .filters-modal-panel {
+    animation: save-panel-in 300ms var(--ease-standard);
+  }
+
+  .listing-modal-overlay {
+    background: rgba(0, 0, 0, 0.6);
+    animation: save-overlay-in 200ms var(--ease-standard);
+  }
+
+  .listing-modal-panel {
+    animation: save-panel-in 300ms var(--ease-standard);
+  }
+
+  .listing-fullscreen-overlay {
+    animation: save-overlay-in 200ms var(--ease-standard);
+  }
+
+  .listing-fullscreen-panel {
+    animation: save-panel-in 300ms var(--ease-standard);
+  }
+
+  .listing-lightbox-overlay {
+    animation: save-overlay-in 200ms var(--ease-standard);
+  }
+}
+
+@media (max-width: 639px) {
+  .save-panel {
+    animation: save-sheet-in 300ms cubic-bezier(0.2, 0, 0, 1);
+  }
+}
+
+/* Home page gutters / container (measured: 24 @744, 32 @950, 48 @1440; content max 1440 incl. padding). */
+:root {
+  --home-px: 24px;
+}
+
+@media (min-width: 950px) {
+  :root {
+    --home-px: 32px;
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --home-px: 48px;
+    /* Header row grows from 80 to 96px at ≥1440 (Airbnb). */
+    --header-h: 96px;
+  }
+}
+
+.container-home {
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: var(--home-px);
+}
+
+/* Carousel scroller: 4px inset so focus rings / shadows are not clipped, cancelled by the negative margins. */
+.home-row,
+.dest-row {
+  /* Rows scroll edge to edge: the scroller is as wide as the page and carries the gutter as padding. */
+  margin: 12px calc(-1 * var(--home-px)) 0;
+  padding: 4px var(--home-px) 0;
+  scroll-padding-inline: var(--home-px);
+}
+
+@media (max-width: 743px) {
+  /* Mobile rows keep 16px under the cards and sit 24px apart (measured @375: row 244.5px tall, 24px top margin). */
+  .home-row,
+  .dest-row {
+    padding-bottom: 16px;
+  }
+
+  .t-section-title {
+    font-size: 18px;
+  }
+}
+
+/* Mobile search pill + chips + bottom nav (<744px, measured @375 on a 360px-wide viewport). */
+.mobile-search-pill {
+  border-radius: var(--r-mobile-search);
+  box-shadow: var(--shadow-mobile-search);
+  transition: box-shadow 200ms var(--ease-standard), transform 250ms var(--ease-standard), background-color 300ms var(--ease-standard),
+    border-color 300ms var(--ease-standard), color 300ms var(--ease-standard);
+}
+
+.mobile-chip {
+  border-radius: var(--r-mobile-search);
+  transition: transform 220ms var(--ease-chip), border-color 220ms var(--ease-chip);
+}
+
+/* The active chip is pressed 2px down and swaps the raised surface for the pressed one. */
+.mobile-chip[aria-current="page"] {
+  transform: translateY(2px);
+}
+
+.mobile-chip-surface {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: opacity 220ms var(--ease-chip);
+}
+.mobile-chip-raised { box-shadow: var(--shadow-chip); }
+.mobile-chip-pressed { box-shadow: var(--shadow-chip-active); }
+
+/* Airbnb lifts rail images off the page on mobile only (measured @375); desktop images are flat. */
+@media (max-width: 743px) {
+  .rail-image {
+    box-shadow: var(--shadow-rail-image-mobile);
+  }
+}
+
+.mobile-nav {
+  transition: transform 200ms cubic-bezier(0.455, 0.03, 0.515, 0.955), visibility 200ms;
+}
+
+.mobile-nav-label {
+  transition: color 300ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Compact (scrolled) search pill, measured @1440: 375.8×46, 1px #ddd border on a separate surface layer; 48px segments overlap it by 1px. */
+.compact-pill {
+  border-radius: var(--r-compact-pill);
+  transition: box-shadow 175ms cubic-bezier(0.2, 0, 0, 1);
+}
+.compact-pill-surface {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-compact-pill);
+  background: #fff;
+  box-shadow: var(--shadow-compact-pill);
+}
+.compact-seg {
+  font-size: 14px;
+  line-height: 1.43;
+  font-weight: 400;
+  color: var(--text);
+}
+
+/*
+ * Header collapse choreography, measured on Airbnb @1440 (scroll 0 → 120): one 450ms spring-fast curve moves the
+ * tab row and the search stack up by 87px; the tabs and the big bar fade out in 175ms (linear) while the big bar
+ * shrinks to 0.55; the compact pill grows out from behind the big bar (surface scaleX 2.127 → 1, row 1.242 → 1 and
+ * fading in, search circle sliding in from +202px). Expanding plays the same curves in reverse.
+ */
+.header-tabs-layer,
+.header-bar-layer,
+.header-pill-layer {
+  transition: transform var(--spring-fast-dur) var(--spring-fast), opacity var(--fade-dur) linear;
+}
+.header-tabs-layer.is-collapsed {
+  transform: translateY(calc(-1 * var(--stack-shift)));
+  opacity: 0;
+}
+.header-bar-layer {
+  transform-origin: center;
+}
+.header-bar-layer.is-collapsed {
+  transform: translateY(calc(-1 * var(--stack-shift))) scale(0.55);
+  opacity: 0;
+}
+.header-pill-layer {
+  transform: translateY(0);
+}
+.header-pill-layer.is-expanded {
+  transform: translateY(var(--stack-shift));
+}
+
+.compact-pill-surface,
+.compact-pill-row,
+.compact-pill-go > button,
+.compact-pill-go > button > svg {
+  transition: transform var(--spring-fast-dur) var(--spring-fast), opacity var(--fade-dur) linear;
+}
+.compact-pill[data-expanded="true"] .compact-pill-surface {
+  transform: scaleX(2.127);
+}
+.compact-pill[data-expanded="true"] .compact-pill-row {
+  transform: scale(1.242);
+  opacity: 0;
+}
+.compact-pill[data-expanded="true"] .compact-pill-go > button {
+  transform: matrix(1.446, 0, 0, 1, 201.967, 0);
+}
+.compact-pill[data-expanded="true"] .compact-pill-go > button > svg {
+  transform: scaleX(0.897);
+}
+
+/* Expanded search bar: segments share the 840px left after the 2×(2+1+2)px divider gutters in a 278.33 : 283.33 : 278.33 ratio. */
+.search-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 278.33fr) auto minmax(0, 283.33fr) auto minmax(0, 278.33fr);
+}
+
+/* Airbnb's search bar has no CSS transitions at all (measured): segment hover / active states switch instantly,
+   so `.search-seg`, `.search-divider` and `.search-bar-outline` deliberately declare no transition. */
+
+.search-bar-outline {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 1px solid var(--border);
+  border-radius: inherit;
+  box-shadow: var(--shadow-search);
+}
+
+.logo-link {
+  transition: color 250ms var(--ease-standard);
+}
+
+.search-divider {
+  align-self: center;
+  flex: none;
+  width: 1px;
+  height: 32px;
+  margin-inline: 2px;
+  background: var(--border);
+}
+
+/* Header right cluster (measured: host pill 40px tall, radius 20, hover #f7f7f7; menu 40px disc hover #ebebeb). */
+.header-host {
+  align-items: center;
+  border-radius: 20px;
+  padding: 11px 12px;
+  transition: box-shadow 200ms var(--ease-standard), transform 250ms var(--ease-standard),
+    background-color 300ms var(--ease-standard), border-color 300ms var(--ease-standard), color 300ms var(--ease-standard);
+}
+
+.header-host:hover {
+  background-color: var(--bg-secondary);
+}
+
+.header-menu {
+  transition: transform 250ms var(--ease-standard);
+}
+
+/* Tabs: label colour never changes on hover (Airbnb swaps the icon for an animated one; ours scales its own icon). */
+.tab-icon {
+  transition: transform 250ms var(--ease-standard);
+}
+
+a:hover > .tab-icon {
+  transform: scale(1.0268);
+}
+
+.tab-underline {
+  transition: opacity 300ms var(--ease-standard), height 300ms var(--ease-standard);
+}
+
+/* Footer links underline on hover (thickness animates), controls grey out to #ebebeb. */
+.footer-link {
+  border-radius: var(--r-4);
+  text-decoration-thickness: 0;
+  transition: text-decoration-thickness 300ms var(--ease-standard), box-shadow 300ms var(--ease-standard),
+    background-color 300ms var(--ease-standard);
+}
+
+.footer-link:hover {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1.3px;
+}
+
+.footer-ctrl {
+  transition: box-shadow 200ms var(--ease-standard), transform 250ms var(--ease-standard),
+    background-color 300ms var(--ease-standard), border-color 300ms var(--ease-standard), color 300ms var(--ease-standard);
+}
+
+.footer-ctrl:hover {
+  background-color: var(--divider);
+}
+
+.card-heart {
+  transition: transform 250ms var(--ease-standard);
+}
+
+/* Row controls: grey #f2f2f2 discs, hover #ebebeb. Arrows animate transform only (0.25s), the title disc also its fill. */
+.row-arrow {
+  transition: transform 250ms var(--ease-standard);
+}
+
+.row-title-arrow {
+  transition: background-color 250ms var(--ease-standard), transform 250ms var(--ease-standard);
+}
+
+.home-row {
+  --peek: 2;
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.promo-row {
+  --promo-n: 1.08;
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-block: 36px;
+  margin-block: -36px;
+}
+
+.promo-card {
+  display: flex;
+  height: 116px;
+  min-width: 0;
+  flex: 0 0 calc((100% - (var(--promo-n) - 1) * 12px) / var(--promo-n));
+  align-items: center;
+  gap: 16px;
+  scroll-snap-align: start;
+  border: var(--border-elevated);
+  border-radius: var(--r-24);
+  background: var(--bg);
+  padding: 0 24px;
+  box-shadow: var(--shadow-secondary);
+  transition: box-shadow 200ms var(--ease-standard), transform 100ms var(--ease-standard);
+}
+
+.promo-card:hover {
+  box-shadow: var(--shadow-primary);
+}
+
+.promo-card:active {
+  transform: scale(0.98);
+}
+
+@media (min-width: 375px) {
+  .promo-row {
+    --promo-n: 1.11;
+  }
+}
+
+@media (min-width: 744px) {
+  .promo-row {
+    --promo-n: 2;
+  }
+}
+
+@media (min-width: 1128px) {
+  .promo-row {
+    --promo-n: 3;
+  }
+}
+
+.home-row-card {
+  flex: 0 0 calc((100% - (var(--peek) - 1) * 12px) / var(--peek));
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 744px) {
+  .home-row {
+    --peek: 4;
+  }
+}
+
+@media (min-width: 950px) {
+  .home-row {
+    --peek: 5;
+  }
+}
+
+@media (min-width: 1128px) {
+  .home-row {
+    --peek: 6;
+  }
+}
+
+@media (min-width: 1440px) {
+  .home-row {
+    --peek: 7;
+  }
+}
+
+.see-all-tile {
+  display: flex;
+  aspect-ratio: 20 / 19;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--card-radius);
+  background: #ffffff;
+  box-shadow: var(--shadow-secondary);
+}
+
+.see-all-fan {
+  position: relative;
+  width: 78%;
+  height: 54%;
+}
+
+.see-all-label {
+  margin-top: 10px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 19px;
+}
+
+.see-all-card {
+  position: absolute;
+  top: 14%;
+  left: 19%;
+  width: 62%;
+  height: 72%;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 4px solid #ffffff;
+  background: #f7f7f7;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.16);
+  opacity: 0;
+  animation-duration: 0.55s;
+  animation-timing-function: cubic-bezier(0.2, 0.85, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+.see-all-card:nth-child(1) {
+  z-index: 3;
+  animation-name: see-all-pop-front;
+  animation-delay: 0.05s;
+}
+
+.see-all-card:nth-child(2) {
+  z-index: 2;
+  animation-name: see-all-pop-mid;
+  animation-delay: 0.34s;
+}
+
+.see-all-card:nth-child(3) {
+  z-index: 1;
+  animation-name: see-all-pop-back;
+  animation-delay: 0.62s;
+}
+
+@keyframes see-all-pop-front {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.7);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(0, 4px) rotate(-7deg) scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 8px) rotate(-6deg) scale(1);
+  }
+}
+
+@keyframes see-all-pop-mid {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-10px, -18px) rotate(8deg) scale(0.94);
+  }
+}
+
+@keyframes see-all-pop-back {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: translate(28px, -4px) rotate(14deg) scale(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .see-all-card {
+    animation: none;
+    opacity: 1;
+  }
+
+  .see-all-card:nth-child(1) {
+    z-index: 3;
+    transform: translate(0, 8px) rotate(-6deg) scale(1);
+  }
+
+  .see-all-card:nth-child(2) {
+    z-index: 2;
+    transform: translate(-10px, -18px) rotate(8deg) scale(0.94);
+  }
+
+  .see-all-card:nth-child(3) {
+    z-index: 1;
+    transform: translate(28px, -4px) rotate(14deg) scale(0.9);
+  }
+}
+
+/* Page overlay behind an open search: fades in over 150ms linear (measured; Airbnb transitions opacity .15s linear). */
+@keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
+.search-overlay { animation: overlay-in 150ms linear; }
+
+.when-panel .airbnb-calendar {
+  width: fit-content;
+  margin-inline: auto;
+}
+
+@media (min-width: 1128px) {
+  :where(a, button, [role="button"], input, select, textarea):focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+  }
+}
+

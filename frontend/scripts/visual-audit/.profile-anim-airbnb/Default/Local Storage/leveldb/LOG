@@ -1,0 +1,8 @@
+2026/10/07-12:41:51.345 32c8 Reusing MANIFEST D:\Airbnb\frontend\scripts\visual-audit\.profile-anim-airbnb\Default\Local Storage\leveldb/MANIFEST-000001
+2026/10/07-12:41:51.347 32c8 Recovering log #3
+2026/10/07-12:41:51.348 32c8 Level-0 table #3: started
+2026/10/07-12:41:51.356 32c8 Level-0 table #3: 16354 bytes OK
+2026/10/07-12:41:51.357 32c8 Recovering log #4
+2026/10/07-12:41:51.361 32c8 Reusing old log D:\Airbnb\frontend\scripts\visual-audit\.profile-anim-airbnb\Default\Local Storage\leveldb/000004.log 
+2026/10/07-12:41:51.365 32c8 Delete type=0 #3
+2026/10/07-12:41:51.365 32c8 Delete type=2 #5
